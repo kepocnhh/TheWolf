@@ -3,6 +3,17 @@ package org.kepocnhh.thewolf.util
 class MutableTags(tags: Map<String, Any>) {
     private val map = tags.toMutableMap()
 
+    fun <T : Any> getOrElse(key: String, supplier: () -> T): T {
+        return synchronized(map) {
+            val value = map[key]
+            if (value == null) {
+                supplier()
+            } else {
+                value as? T ?: TODO()
+            }
+        }
+    }
+
     fun <T : Any> getOrNull(key: String): T? {
         return synchronized(map) {
             val value = map[key]

@@ -10,8 +10,16 @@ import java.io.Closeable
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-abstract class Logic(tags: Map<String, Any> = emptyMap()) {
-    val tags = MutableTags(tags)
+abstract class Logic {
+    internal val tags: MutableTags
+
+    constructor() : this(emptyMap())
+
+    constructor(context: CoroutineContext) : this(mapOf(COROUTINE_CONTEXT_KEY to context))
+
+    constructor(tags: Map<String, Any>) {
+        this.tags = MutableTags(tags)
+    }
 
     internal fun clear() {
         for ((_, tag) in tags) {
@@ -26,13 +34,24 @@ private class FooLogic(
     private val injection: Injection,
 ) : Logic(tags = mapOf(COROUTINE_CONTEXT_KEY to injection.contexts.main)) {
     fun foo() {
-        launch {
+        coroutineScope.launch(tags.getOrNull(COROUTINE_CONTEXT_KEY) ?: TODO()) {
             // todo
         }
     }
 }
 
-fun <T> Logic.getCoroutineScope(key: String, supplier: () -> T): CoroutineScope where T : Closeable, T : CoroutineScope {
+private class BarLogic(
+    private val injection: Injection,
+) : Logic(context = injection.contexts.main) {
+    fun bar() = launch {
+        // todo
+    }
+}
+
+fun <T> Logic.getCoroutineScope(
+    key: String,
+    supplier: () -> T,
+): CoroutineScope where T : Closeable, T : CoroutineScope {
     return tags.getOrPut(key = key, supplier = supplier)
 }
 
@@ -48,7 +67,7 @@ val Logic.coroutineScope: CoroutineScope
     }
 
 fun Logic.launch(
-    context: CoroutineContext = tags.getOrNull(COROUTINE_CONTEXT_KEY) ?: EmptyCoroutineContext,
+    context: CoroutineContext = tags.getOrElse(COROUTINE_CONTEXT_KEY) { EmptyCoroutineContext },
     block: suspend CoroutineScope.() -> Unit,
 ) {
     coroutineScope.launch(context, block = block)

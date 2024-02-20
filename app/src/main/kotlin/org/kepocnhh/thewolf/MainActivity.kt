@@ -25,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.kepocnhh.thewolf.module.app.ColorsType
+import org.kepocnhh.thewolf.module.theme.ThemeLogic
 import org.kepocnhh.thewolf.module.theme.ThemeViewModel
 
 internal class MainActivity : AppCompatActivity() {
@@ -34,11 +35,12 @@ internal class MainActivity : AppCompatActivity() {
             BackHandler {
                 finish()
             }
-            val themeViewModel = App.viewModel<ThemeViewModel>()
-            val themeState = themeViewModel.state.collectAsState().value
+//            val themeViewModel = App.viewModel<ThemeViewModel>()
+            val themeLogic = App.logic<ThemeLogic>()
+            val themeState = themeLogic.state.collectAsState().value
             LaunchedEffect(Unit) {
                 if (themeState == null) {
-                    themeViewModel.requestThemeState()
+                    themeLogic.requestThemeState()
                 }
             }
             if (themeState != null) {
@@ -122,8 +124,9 @@ internal class MainActivity : AppCompatActivity() {
         BackHandler {
             onBack()
         }
-        val themeViewModel = App.viewModel<ThemeViewModel>()
-        val themeState = themeViewModel.state.collectAsState().value ?: TODO()
+//        val themeViewModel = App.viewModel<ThemeViewModel>()
+        val themeLogic = App.logic<ThemeLogic>()
+        val themeState = themeLogic.state.collectAsState().value ?: TODO()
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -139,7 +142,7 @@ internal class MainActivity : AppCompatActivity() {
                         val colorsType = ColorsType.entries.getOrNull(themeState.colorsType.ordinal + 1)
                             ?: ColorsType.entries.firstOrNull()
                             ?: TODO()
-                        themeViewModel.setThemeState(themeState.copy(colorsType = colorsType))
+                        themeLogic.setThemeState(themeState.copy(colorsType = colorsType))
                     },
                 )
             }
@@ -153,8 +156,9 @@ internal class MainActivity : AppCompatActivity() {
         BackHandler {
             onBack()
         }
-        val viewModel = App.viewModel<BarViewModel>()
-        val clicks = viewModel.state.collectAsState().value.clicks
+//        val viewModel = App.viewModel<BarViewModel>()
+        val logic = App.logic<BarLogic>()
+        val clicks = logic.state.collectAsState().value.clicks
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -168,7 +172,7 @@ internal class MainActivity : AppCompatActivity() {
                 Button(
                     text = "click me",
                     onClick = {
-                        viewModel.click()
+                        logic.click()
                     },
                 )
             }
