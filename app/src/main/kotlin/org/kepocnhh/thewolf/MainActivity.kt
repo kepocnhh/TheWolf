@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +50,39 @@ internal class MainActivity : AppCompatActivity() {
     }
 
     @Composable
+    private fun Button(text: String, onClick: () -> Unit) {
+        val textStyle = TextStyle(
+            color = App.Theme.colors.foreground,
+            textAlign = TextAlign.Center,
+        )
+        BasicText(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .clickable(onClick = onClick)
+                .wrapContentHeight(),
+            text = text,
+            style = textStyle,
+        )
+    }
+
+    @Composable
+    private fun Text(text: String) {
+        val textStyle = TextStyle(
+            color = App.Theme.colors.foreground,
+            textAlign = TextAlign.Center,
+        )
+        BasicText(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .wrapContentHeight(),
+            text = text,
+            style = textStyle,
+        )
+    }
+
+    @Composable
     private fun TestScreen() {
         Box(
             modifier = Modifier
@@ -60,30 +94,23 @@ internal class MainActivity : AppCompatActivity() {
                 modifier = Modifier
                     .align(Alignment.Center),
             ) {
-                val textStyle = TextStyle(
-                    color = App.Theme.colors.foreground,
-                    textAlign = TextAlign.Center,
-                )
-                BasicText(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp)
-                        .clickable {
-                            state.intValue = 1
-                        },
+                Button(
                     text = "foo",
-                    style = textStyle,
+                    onClick = {
+                        state.intValue = 1
+                    },
                 )
-                BasicText(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp),
-                    text = "${BuildConfig.APPLICATION_ID}\n${BuildConfig.VERSION_NAME}-${BuildConfig.VERSION_CODE}",
-                    style = textStyle,
+                Button(
+                    text = "bar",
+                    onClick = {
+                        state.intValue = 2
+                    },
                 )
+                Text("${BuildConfig.APPLICATION_ID}\n${BuildConfig.VERSION_NAME}-${BuildConfig.VERSION_CODE}")
             }
             when (state.intValue) {
                 1 -> FooScreen(onBack = { state.intValue = 0 })
+                2 -> BarScreen(onBack = { state.intValue = 0 })
             }
         }
     }
@@ -106,22 +133,43 @@ internal class MainActivity : AppCompatActivity() {
                 modifier = Modifier
                     .align(Alignment.Center),
             ) {
-                val textStyle = TextStyle(
-                    color = App.Theme.colors.foreground,
-                    textAlign = TextAlign.Center,
-                )
-                BasicText(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp)
-                        .clickable {
-                            val colorsType = ColorsType.entries.getOrNull(themeState.colorsType.ordinal + 1)
-                                ?: ColorsType.entries.firstOrNull()
-                                ?: TODO()
-                            themeViewModel.setThemeState(themeState.copy(colorsType = colorsType))
-                        },
+                Button(
                     text = "color: ${themeState.colorsType.name}",
-                    style = textStyle,
+                    onClick = {
+                        val colorsType = ColorsType.entries.getOrNull(themeState.colorsType.ordinal + 1)
+                            ?: ColorsType.entries.firstOrNull()
+                            ?: TODO()
+                        themeViewModel.setThemeState(themeState.copy(colorsType = colorsType))
+                    },
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun BarScreen(
+        onBack: () -> Unit,
+    ) {
+        BackHandler {
+            onBack()
+        }
+        val viewModel = App.viewModel<BarViewModel>()
+        val clicks = viewModel.state.collectAsState().value.clicks
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(App.Theme.colors.background),
+        ) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center),
+            ) {
+                Text("clicks: $clicks")
+                Button(
+                    text = "click me",
+                    onClick = {
+                        viewModel.click()
+                    },
                 )
             }
         }
