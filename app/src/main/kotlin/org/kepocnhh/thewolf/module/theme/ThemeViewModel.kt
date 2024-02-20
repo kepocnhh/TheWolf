@@ -16,7 +16,14 @@ internal class ThemeViewModel(
 
     fun requestThemeState() = injection.launch {
         _state.value = withContext(injection.contexts.default) {
-            ThemeState(ColorsType.DARK) // todo
+            injection.locals.themeState
         }
+    }
+
+    fun setThemeState(value: ThemeState) = injection.launch {
+        withContext(injection.contexts.default) {
+            injection.locals.themeState = value
+        }
+        _state.value = value
     }
 }

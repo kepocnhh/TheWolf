@@ -5,15 +5,25 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import org.kepocnhh.thewolf.module.app.ColorsType
 import org.kepocnhh.thewolf.module.theme.ThemeViewModel
 
 internal class MainActivity : AppCompatActivity() {
@@ -43,14 +53,77 @@ internal class MainActivity : AppCompatActivity() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(App.Theme.colors.background)
+                .background(App.Theme.colors.background),
         ) {
-            BasicText(
+            val state = remember { mutableIntStateOf(0) }
+            Column(
                 modifier = Modifier
                     .align(Alignment.Center),
-                text = "${BuildConfig.APPLICATION_ID}\n${BuildConfig.VERSION_NAME}-${BuildConfig.VERSION_CODE}",
-                style = TextStyle(color = App.Theme.colors.foreground),
-            )
+            ) {
+                val textStyle = TextStyle(
+                    color = App.Theme.colors.foreground,
+                    textAlign = TextAlign.Center,
+                )
+                BasicText(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .clickable {
+                            state.intValue = 1
+                        },
+                    text = "foo",
+                    style = textStyle,
+                )
+                BasicText(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp),
+                    text = "${BuildConfig.APPLICATION_ID}\n${BuildConfig.VERSION_NAME}-${BuildConfig.VERSION_CODE}",
+                    style = textStyle,
+                )
+            }
+            when (state.intValue) {
+                1 -> FooScreen(onBack = { state.intValue = 0 })
+            }
+        }
+    }
+
+    @Composable
+    private fun FooScreen(
+        onBack: () -> Unit,
+    ) {
+        BackHandler {
+            onBack()
+        }
+        val themeViewModel = App.viewModel<ThemeViewModel>()
+        val themeState = themeViewModel.state.collectAsState().value ?: TODO()
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(App.Theme.colors.background),
+        ) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center),
+            ) {
+                val textStyle = TextStyle(
+                    color = App.Theme.colors.foreground,
+                    textAlign = TextAlign.Center,
+                )
+                BasicText(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .clickable {
+                            val colorsType = ColorsType.entries.getOrNull(themeState.colorsType.ordinal + 1)
+                                ?: ColorsType.entries.firstOrNull()
+                                ?: TODO()
+                            themeViewModel.setThemeState(themeState.copy(colorsType = colorsType))
+                        },
+                    text = "color: ${themeState.colorsType.name}",
+                    style = textStyle,
+                )
+            }
         }
     }
 }

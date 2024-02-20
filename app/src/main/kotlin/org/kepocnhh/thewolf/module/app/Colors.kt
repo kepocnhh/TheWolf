@@ -11,5 +11,9 @@ internal class Colors private constructor(
             background = Color(0xff000000),
             foreground = Color(0xffffffff),
         )
+        val Light = Colors(
+            background = Color(0xffffffff),
+            foreground = Color(0xff000000),
+        )
     }
 }

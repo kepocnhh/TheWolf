@@ -1,6 +1,7 @@
 package org.kepocnhh.thewolf
 
 import android.app.Application
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -16,6 +17,7 @@ import org.kepocnhh.thewolf.module.app.ColorsType
 import org.kepocnhh.thewolf.module.app.Injection
 import org.kepocnhh.thewolf.module.app.ThemeState
 import org.kepocnhh.thewolf.provider.Contexts
+import org.kepocnhh.thewolf.provider.LocalDataProvider
 import org.kepocnhh.thewolf.util.lifecycle.AbstractViewModel
 
 internal class App : Application() {
@@ -33,7 +35,9 @@ internal class App : Application() {
             content: @Composable () -> Unit,
         ) {
             val colors = when (themeState.colorsType) {
+                ColorsType.AUTO -> if (isSystemInDarkTheme()) Colors.Dark else Colors.Light
                 ColorsType.DARK -> Colors.Dark
+                ColorsType.LIGHT -> Colors.Light
             }
             CompositionLocalProvider(
                 LocalColors provides colors,
@@ -42,6 +46,11 @@ internal class App : Application() {
         }
     }
 
+    // todo
+    private class MockLocalDataProvider(
+        override var themeState: ThemeState,
+    ) : LocalDataProvider
+
     override fun onCreate() {
         super.onCreate()
         _injection = Injection(
@@ -49,6 +58,7 @@ internal class App : Application() {
                 main = Dispatchers.Main,
                 default = Dispatchers.Default,
             ),
+            locals = MockLocalDataProvider(themeState = ThemeState(colorsType = ColorsType.AUTO))
         )
     }
 
