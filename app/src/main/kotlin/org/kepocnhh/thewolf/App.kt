@@ -1,6 +1,7 @@
 package org.kepocnhh.thewolf
 
 import android.app.Application
+import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -36,6 +37,7 @@ internal class App : Application() {
 
         @Composable
         fun Composition(
+            onBackPressedDispatcher: OnBackPressedDispatcher,
             themeState: ThemeState,
             content: @Composable () -> Unit,
         ) {
@@ -46,6 +48,7 @@ internal class App : Application() {
             }
             CompositionLocalProvider(
                 LocalColors provides colors,
+                LocalOnBackPressedDispatcher provides onBackPressedDispatcher,
                 content = content,
             )
         }

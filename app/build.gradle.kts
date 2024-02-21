@@ -132,7 +132,6 @@ androidComponents.onVariants { variant ->
 }
 
 dependencies {
-//    implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.compose.foundation:foundation:${Version.Android.compose}")
 }
