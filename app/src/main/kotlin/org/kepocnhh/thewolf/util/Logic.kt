@@ -11,13 +11,24 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 abstract class Logic {
-    internal val tags: MutableTags
+    private val mainCoroutineContext: CoroutineContext
+    private val tags: MutableTags
 
-    constructor() : this(emptyMap())
+    constructor() : this(
+        mainCoroutineContext = EmptyCoroutineContext,
+        tags = emptyMap(),
+    )
 
-    constructor(context: CoroutineContext) : this(mapOf(COROUTINE_CONTEXT_KEY to context))
+    constructor(mainCoroutineContext: CoroutineContext) : this(
+        mainCoroutineContext = mainCoroutineContext,
+        tags = emptyMap(),
+    )
 
-    constructor(tags: Map<String, Any>) {
+    constructor(
+        mainCoroutineContext: CoroutineContext,
+        tags: Map<String, Any>,
+    ) {
+        this.mainCoroutineContext = mainCoroutineContext
         this.tags = MutableTags(tags)
     }
 
@@ -28,13 +39,47 @@ abstract class Logic {
         }
         tags.clear()
     }
+
+    protected fun <T> getCoroutineScope(
+        key: String,
+        supplier: () -> T,
+    ): CoroutineScope where T : Closeable, T : CoroutineScope {
+        return tags.getOrPut(key = key, supplier = supplier)
+    }
+
+    protected val coroutineScope: CoroutineScope
+        get() {
+            return getCoroutineScope(
+                key = COROUTINE_SCOPE_KEY,
+                supplier = { CloseableCoroutineScope(SupervisorJob() + Dispatchers.Main.immediate) },
+            )
+        }
+
+    protected fun launch(
+        context: CoroutineContext = mainCoroutineContext,
+        block: suspend CoroutineScope.() -> Unit,
+    ) {
+        coroutineScope.launch(context, block = block)
+    }
+
+    companion object {
+        private const val COROUTINE_SCOPE_KEY = "org.kepocnhh.thewolf.util.COROUTINE_SCOPE_KEY" // todo
+    }
 }
 
 private class FooLogic(
     private val injection: Injection,
-) : Logic(tags = mapOf(COROUTINE_CONTEXT_KEY to injection.contexts.main)) {
+) : Logic() {
     fun foo() {
-        coroutineScope.launch(tags.getOrNull(COROUTINE_CONTEXT_KEY) ?: TODO()) {
+        coroutineScope.launch(injection.contexts.main) {
+            // todo
+        }
+    }
+
+    fun foo2() {
+        getCoroutineScope(key = "foo") {
+            CloseableCoroutineScope(SupervisorJob())
+        }.launch(injection.contexts.main) {
             // todo
         }
     }
@@ -42,35 +87,18 @@ private class FooLogic(
 
 private class BarLogic(
     private val injection: Injection,
-) : Logic(context = injection.contexts.main) {
+) : Logic(injection.contexts.main) {
     fun bar() = launch {
         // todo
     }
 }
 
-fun <T> Logic.getCoroutineScope(
-    key: String,
-    supplier: () -> T,
-): CoroutineScope where T : Closeable, T : CoroutineScope {
-    return tags.getOrPut(key = key, supplier = supplier)
-}
-
-private const val COROUTINE_SCOPE_KEY = "org.kepocnhh.thewolf.util.COROUTINE_SCOPE_KEY" // todo
-private const val COROUTINE_CONTEXT_KEY = "org.kepocnhh.thewolf.util.COROUTINE_CONTEXT_KEY" // todo
-
-val Logic.coroutineScope: CoroutineScope
-    get() {
-        return getCoroutineScope(
-            key = COROUTINE_SCOPE_KEY,
-            supplier = { CloseableCoroutineScope(SupervisorJob() + Dispatchers.Main.immediate) },
-        )
+private class BazLogic(
+    private val injection: Injection,
+) : Logic() {
+    fun baz() = launch(injection.contexts.main) {
+        // todo
     }
-
-fun Logic.launch(
-    context: CoroutineContext = tags.getOrElse(COROUTINE_CONTEXT_KEY) { EmptyCoroutineContext },
-    block: suspend CoroutineScope.() -> Unit,
-) {
-    coroutineScope.launch(context, block = block)
 }
 
 internal class CloseableCoroutineScope(

@@ -6,7 +6,6 @@ import kotlinx.coroutines.withContext
 import org.kepocnhh.thewolf.module.app.Injection
 import org.kepocnhh.thewolf.module.app.ThemeState
 import org.kepocnhh.thewolf.util.Logic
-import org.kepocnhh.thewolf.util.launch
 
 internal class ThemeLogic(
     private val injection: Injection,
