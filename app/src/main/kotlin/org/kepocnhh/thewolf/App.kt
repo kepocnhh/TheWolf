@@ -24,8 +24,6 @@ import org.kepocnhh.thewolf.util.remove
 import org.kepocnhh.thewolf.util.Logic
 import org.kepocnhh.thewolf.util.LogicFactory
 import org.kepocnhh.thewolf.util.LogicProvider
-import org.kepocnhh.thewolf.util.lifecycle.AbstractViewModel
-import kotlin.reflect.KClass
 
 internal class App : Application() {
     object Theme {
@@ -71,7 +69,6 @@ internal class App : Application() {
 
     companion object {
         private var _injection: Injection? = null
-        //
         private val _logicProvider = LogicProvider(
             factory = object : LogicFactory {
                 override fun <T : Logic> create(type: Class<T>): T {
@@ -97,35 +94,6 @@ internal class App : Application() {
                 }
             }
             return logic
-        }
-        //
-        private val _viewModelFactory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val injection = checkNotNull(_injection) { "No injection!" }
-                return modelClass
-                    .getConstructor(Injection::class.java)
-                    .newInstance(injection)
-            }
-        }
-        private val vmStores = mutableMapOf<String, ViewModelStore>()
-
-        @Composable
-        inline fun <reified T : AbstractViewModel> viewModel(): T {
-            val key = T::class.java.name
-            val (dispose, store) = synchronized(App::class.java) {
-                remember { !vmStores.containsKey(key) } to vmStores.getOrPut(key, ::ViewModelStore)
-            }
-            DisposableEffect(Unit) {
-                onDispose {
-                    synchronized(App::class.java) {
-                        if (dispose) {
-                            vmStores.remove(key)
-                            store.clear()
-                        }
-                    }
-                }
-            }
-            return ViewModelProvider(store, _viewModelFactory)[T::class.java]
         }
     }
 }

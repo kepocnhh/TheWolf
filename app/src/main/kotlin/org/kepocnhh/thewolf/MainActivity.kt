@@ -1,8 +1,7 @@
 package org.kepocnhh.thewolf
 
 import android.os.Bundle
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.setContent
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,23 +13,68 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleOwner
 import org.kepocnhh.thewolf.module.app.ColorsType
 import org.kepocnhh.thewolf.module.theme.ThemeLogic
-import org.kepocnhh.thewolf.module.theme.ThemeViewModel
 
 internal class MainActivity : AppCompatActivity() {
+    @Composable
+    private fun BackHandler(enabled: Boolean = true, block: () -> Unit) {
+        val onBack = rememberUpdatedState(block).value
+        val callback = remember {
+            object : OnBackPressedCallback(enabled) {
+                override fun handleOnBackPressed() {
+                    onBack()
+                }
+            }
+        }
+        SideEffect {
+            callback.isEnabled = enabled
+        }
+        val lifecycleOwner: LifecycleOwner = this
+        DisposableEffect(lifecycleOwner, onBackPressedDispatcher) {
+            onBackPressedDispatcher.addCallback(lifecycleOwner, callback)
+            onDispose {
+                callback.remove()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val view = ComposeView(this)
+        setContentView(view)
+        view.setContent {
+//            BackHandler {
+//                finish()
+//            }
+            val themeLogic = App.logic<ThemeLogic>()
+            val themeState = themeLogic.state.collectAsState().value
+            LaunchedEffect(Unit) {
+                if (themeState == null) {
+                    themeLogic.requestThemeState()
+                }
+            }
+            if (themeState != null) {
+                App.Theme.Composition(themeState = themeState) {
+                    TestScreen()
+                }
+            }
+        }
+        /*
         setContent {
             BackHandler {
                 finish()
@@ -49,6 +93,7 @@ internal class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        */
     }
 
     @Composable
