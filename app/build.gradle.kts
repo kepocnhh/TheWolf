@@ -5,6 +5,7 @@ import sp.gx.core.kebabCase
 repositories {
     google()
     mavenCentral()
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 
 plugins {
@@ -134,4 +135,5 @@ androidComponents.onVariants { variant ->
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.compose.foundation:foundation:${Version.Android.compose}")
+    implementation("com.github.kepocnhh:Logics:0.1.3-SNAPSHOT")
 }

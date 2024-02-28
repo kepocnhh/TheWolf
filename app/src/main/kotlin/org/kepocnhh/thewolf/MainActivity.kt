@@ -23,7 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.kepocnhh.thewolf.module.app.ColorsType
-import org.kepocnhh.thewolf.module.theme.ThemeLogic
+import org.kepocnhh.thewolf.module.theme.ThemeLogics
 
 internal class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +34,7 @@ internal class MainActivity : AppCompatActivity() {
 //            BackHandler {
 //                finish()
 //            }
-            val themeLogic = App.logic<ThemeLogic>()
+            val themeLogic = App.logics<ThemeLogics>()
             val themeState = themeLogic.state.collectAsState().value
             LaunchedEffect(Unit) {
                 if (themeState == null) {
@@ -145,8 +145,7 @@ internal class MainActivity : AppCompatActivity() {
         BackHandler {
             onBack()
         }
-//        val themeViewModel = App.viewModel<ThemeViewModel>()
-        val themeLogic = App.logic<ThemeLogic>()
+        val themeLogic = App.logics<ThemeLogics>()
         val themeState = themeLogic.state.collectAsState().value ?: TODO()
         Box(
             modifier = Modifier
@@ -177,8 +176,7 @@ internal class MainActivity : AppCompatActivity() {
         BackHandler {
             onBack()
         }
-//        val viewModel = App.viewModel<BarViewModel>()
-        val logic = App.logic<BarLogic>()
+        val logic = App.logics<BarLogics>()
         val clicks = logic.state.collectAsState().value.clicks
         Box(
             modifier = Modifier

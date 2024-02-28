@@ -9,9 +9,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStore
 import kotlinx.coroutines.Dispatchers
 import org.kepocnhh.thewolf.module.app.Colors
 import org.kepocnhh.thewolf.module.app.ColorsType
@@ -19,12 +16,12 @@ import org.kepocnhh.thewolf.module.app.Injection
 import org.kepocnhh.thewolf.module.app.ThemeState
 import org.kepocnhh.thewolf.provider.Contexts
 import org.kepocnhh.thewolf.provider.LocalDataProvider
-import org.kepocnhh.thewolf.util.contains
-import org.kepocnhh.thewolf.util.get
-import org.kepocnhh.thewolf.util.remove
-import org.kepocnhh.thewolf.util.Logic
-import org.kepocnhh.thewolf.util.LogicFactory
-import org.kepocnhh.thewolf.util.LogicProvider
+import sp.kx.logics.Logics
+import sp.kx.logics.LogicsFactory
+import sp.kx.logics.LogicsProvider
+import sp.kx.logics.contains
+import sp.kx.logics.get
+import sp.kx.logics.remove
 
 internal class App : Application() {
     object Theme {
@@ -72,9 +69,9 @@ internal class App : Application() {
 
     companion object {
         private var _injection: Injection? = null
-        private val _logicProvider = LogicProvider(
-            factory = object : LogicFactory {
-                override fun <T : Logic> create(type: Class<T>): T {
+        private val _logicsProvider = LogicsProvider(
+            factory = object : LogicsFactory {
+                override fun <T : Logics> create(type: Class<T>): T {
                     val injection = checkNotNull(_injection) { "No injection!" }
                     return type
                         .getConstructor(Injection::class.java)
@@ -83,15 +80,15 @@ internal class App : Application() {
             },
         )
         @Composable
-        inline fun <reified T : Logic> logic(label: String = T::class.java.name): T {
-            val (contains, logic) = synchronized(Logic::class.java) {
-                remember { _logicProvider.contains<T>(label = label) } to _logicProvider.get<T>(label = label)
+        inline fun <reified T : Logics> logics(label: String = T::class.java.name): T {
+            val (contains, logic) = synchronized(App::class.java) {
+                remember { _logicsProvider.contains<T>(label = label) } to _logicsProvider.get<T>(label = label)
             }
             DisposableEffect(Unit) {
                 onDispose {
-                    synchronized(Logic::class.java) {
+                    synchronized(App::class.java) {
                         if (!contains) {
-                            _logicProvider.remove<T>(label = label)
+                            _logicsProvider.remove<T>(label = label)
                         }
                     }
                 }

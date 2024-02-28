@@ -4,11 +4,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import org.kepocnhh.thewolf.module.app.Injection
-import org.kepocnhh.thewolf.util.Logic
+import sp.kx.logics.Logics
 
-internal class BarLogic(
+internal class BarLogics(
     private val injection: Injection,
-) : Logic(injection.contexts.main) {
+) : Logics(injection.contexts.main) {
     data class State(val clicks: Int)
     private val _state = MutableStateFlow(State(clicks = 0))
     val state = _state.asStateFlow()

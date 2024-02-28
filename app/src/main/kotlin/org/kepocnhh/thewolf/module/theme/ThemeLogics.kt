@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import org.kepocnhh.thewolf.module.app.Injection
 import org.kepocnhh.thewolf.module.app.ThemeState
-import org.kepocnhh.thewolf.util.Logic
+import sp.kx.logics.Logics
 
-internal class ThemeLogic(
+internal class ThemeLogics(
     private val injection: Injection,
-) : Logic(injection.contexts.main) {
+) : Logics(injection.contexts.main) {
     private val _state = MutableStateFlow<ThemeState?>(null)
     val state = _state.asStateFlow()
 
