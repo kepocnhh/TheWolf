@@ -10,6 +10,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.Dispatchers
+import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.module.app.Colors
 import org.kepocnhh.thewolf.module.app.ColorsType
 import org.kepocnhh.thewolf.module.app.Injection
@@ -22,6 +23,9 @@ import sp.kx.logics.LogicsProvider
 import sp.kx.logics.contains
 import sp.kx.logics.get
 import sp.kx.logics.remove
+import java.util.UUID
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class App : Application() {
     object Theme {
@@ -54,6 +58,7 @@ internal class App : Application() {
     // todo
     private class MockLocalDataProvider(
         override var themeState: ThemeState,
+        override var tasks: List<Task>,
     ) : LocalDataProvider
 
     override fun onCreate() {
@@ -63,7 +68,23 @@ internal class App : Application() {
                 main = Dispatchers.Main,
                 default = Dispatchers.Default,
             ),
-            locals = MockLocalDataProvider(themeState = ThemeState(colorsType = ColorsType.AUTO))
+            locals = MockLocalDataProvider(
+                themeState = ThemeState(colorsType = ColorsType.AUTO),
+                tasks = listOf(
+                    Task(
+                        id = UUID.randomUUID(),
+                        title = "task #1",
+                        isChecked = false,
+                        date = System.currentTimeMillis().milliseconds - 24.hours,
+                    ),
+                    Task(
+                        id = UUID.randomUUID(),
+                        title = "task #2",
+                        isChecked = true,
+                        date = System.currentTimeMillis().milliseconds - 48.hours,
+                    ),
+                ),
+            )
         )
     }
 
