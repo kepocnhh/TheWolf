@@ -3,12 +3,14 @@ package org.kepocnhh.thewolf
 import android.app.Application
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalView
 import kotlinx.coroutines.Dispatchers
 import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.module.app.Colors
@@ -17,6 +19,8 @@ import org.kepocnhh.thewolf.module.app.Injection
 import org.kepocnhh.thewolf.module.app.ThemeState
 import org.kepocnhh.thewolf.provider.Contexts
 import org.kepocnhh.thewolf.provider.LocalDataProvider
+import org.kepocnhh.thewolf.util.compose.LocalOnBackPressedDispatcher
+import org.kepocnhh.thewolf.util.compose.toPaddings
 import sp.kx.logics.Logics
 import sp.kx.logics.LogicsFactory
 import sp.kx.logics.LogicsProvider
@@ -30,11 +34,17 @@ import kotlin.time.Duration.Companion.milliseconds
 internal class App : Application() {
     object Theme {
         private val LocalColors = staticCompositionLocalOf<Colors> { error("No colors!") }
+        private val LocalInsets = staticCompositionLocalOf<PaddingValues> { error("No insets!") }
 
         val colors: Colors
             @Composable
             @ReadOnlyComposable
             get() = LocalColors.current
+
+        val insets: PaddingValues
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalInsets.current
 
         @Composable
         fun Composition(
@@ -47,8 +57,10 @@ internal class App : Application() {
                 ColorsType.DARK -> Colors.Dark
                 ColorsType.LIGHT -> Colors.Light
             }
+            val insets = LocalView.current.rootWindowInsets.toPaddings()
             CompositionLocalProvider(
                 LocalColors provides colors,
+                LocalInsets provides insets,
                 LocalOnBackPressedDispatcher provides onBackPressedDispatcher,
                 content = content,
             )
@@ -70,20 +82,14 @@ internal class App : Application() {
             ),
             locals = MockLocalDataProvider(
                 themeState = ThemeState(colorsType = ColorsType.AUTO),
-                tasks = listOf(
+                tasks = (1..30).map { index ->
                     Task(
                         id = UUID.randomUUID(),
-                        title = "task #1",
-                        isChecked = false,
-                        date = System.currentTimeMillis().milliseconds - 24.hours,
-                    ),
-                    Task(
-                        id = UUID.randomUUID(),
-                        title = "task #2",
+                        title = "task #$index",
                         isChecked = true,
-                        date = System.currentTimeMillis().milliseconds - 48.hours,
-                    ),
-                ),
+                        date = System.currentTimeMillis().milliseconds - 24.hours - index.hours,
+                    )
+                },
             )
         )
     }

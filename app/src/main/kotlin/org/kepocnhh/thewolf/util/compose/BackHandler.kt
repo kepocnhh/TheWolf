@@ -1,4 +1,4 @@
-package org.kepocnhh.thewolf
+package org.kepocnhh.thewolf.util.compose
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher

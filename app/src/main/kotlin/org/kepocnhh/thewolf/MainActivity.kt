@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.kepocnhh.thewolf.module.tasks.TasksScreen
 import org.kepocnhh.thewolf.module.theme.ThemeLogics
+import org.kepocnhh.thewolf.util.compose.BackHandler
 
 internal class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

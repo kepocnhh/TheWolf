@@ -3,6 +3,7 @@ package org.kepocnhh.thewolf.module.tasks
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,9 +42,15 @@ private fun TasksScreen(state: TasksLogics.State) {
         modifier = Modifier
             .fillMaxSize(),
     ) {
+        val insets = App.Theme.insets
+        val contentPadding = PaddingValues(
+            top = insets.calculateTopPadding(),
+            bottom = insets.calculateBottomPadding(),
+        )
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
+            contentPadding = contentPadding,
         ) {
             items(
                 items = state.tasks,
