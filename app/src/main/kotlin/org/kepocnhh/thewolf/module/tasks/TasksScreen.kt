@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.entity.Task
+import org.kepocnhh.thewolf.entity.YMD
 
 @Composable
 private fun Text(text: String) {
@@ -76,6 +77,28 @@ private fun TaskItem(item: Task) {
 }
 
 @Composable
+private fun DateItem(item: YMD) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(24.dp)
+            .padding(horizontal = 16.dp),
+    ) {
+        BasicText(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentHeight(),
+            text = String.format("%02d.%02d.%02d", item.year, item.month + 1, item.day),
+            style = TextStyle(
+                color = App.Theme.colors.text,
+                textAlign = TextAlign.Start,
+                fontSize = 15.sp,
+            ),
+        )
+    }
+}
+
+@Composable
 private fun TasksScreen(state: TasksLogics.State) {
     Box(
         modifier = Modifier
@@ -95,11 +118,19 @@ private fun TasksScreen(state: TasksLogics.State) {
             contentPadding = contentPadding,
             verticalArrangement = Arrangement.spacedBy(itemsPadding, itemsAlign),
         ) {
-            items(
-                items = state.tasks,
-                key = { it.id },
-            ) { task ->
-                TaskItem(item = task)
+            val dates = state.groups.keys
+            for (date in dates) {
+                item(
+                    key = date.toString(),
+                ) {
+                    DateItem(item = date)
+                }
+                items(
+                    items = state.groups[date].orEmpty(),
+                    key = { it.id },
+                ) { task ->
+                    TaskItem(item = task)
+                }
             }
         }
     }

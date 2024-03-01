@@ -87,7 +87,7 @@ internal class App : Application() {
                         id = UUID.randomUUID(),
                         title = "task #$index",
                         isChecked = true,
-                        date = System.currentTimeMillis().milliseconds - 24.hours - index.hours,
+                        date = System.currentTimeMillis().milliseconds - 48.hours + (index * 6).hours,
                     )
                 },
             )
