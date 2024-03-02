@@ -24,9 +24,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.flow.StateFlow
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.entity.YMD
+import sp.kx.logics.Logics
 
 @Composable
 private fun Text(text: String) {
@@ -120,16 +122,19 @@ private fun TasksScreen(state: TasksLogics.State) {
         ) {
             val dates = state.groups.keys
             for (date in dates) {
-                item(
-                    key = date.toString(),
-                ) {
-                    DateItem(item = date)
-                }
-                items(
-                    items = state.groups[date].orEmpty(),
-                    key = { it.id },
-                ) { task ->
-                    TaskItem(item = task)
+                val tasks = state.groups[date].orEmpty()
+                if (tasks.isNotEmpty()) {
+                    item(
+                        key = date.toString(),
+                    ) {
+                        DateItem(item = date)
+                    }
+                    items(
+                        items = tasks,
+                        key = Task::id,
+                    ) { task ->
+                        TaskItem(item = task)
+                    }
                 }
             }
         }
