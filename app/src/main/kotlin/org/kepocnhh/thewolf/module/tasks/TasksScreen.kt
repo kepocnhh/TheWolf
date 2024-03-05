@@ -1,5 +1,8 @@
 package org.kepocnhh.thewolf.module.tasks
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +31,7 @@ import kotlinx.coroutines.flow.StateFlow
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.entity.YMD
+import org.kepocnhh.thewolf.util.compose.Squares
 import sp.kx.logics.Logics
 
 @Composable
@@ -155,6 +159,15 @@ internal fun TasksScreen() {
         }
         if (state != null) {
             TasksScreen(state)
+        }
+        AnimatedVisibility(
+            modifier = Modifier
+                .align(Alignment.Center),
+            enter = fadeIn(),
+            exit = fadeOut(),
+            visible = state == null,
+        ) {
+            Squares()
         }
     }
 }
