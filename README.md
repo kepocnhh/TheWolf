@@ -9,8 +9,8 @@ Another todo list application.
 - [ ] keyboard lib
 - [ ] pinpad lib
 - [ ] clickable text lib
-- [ ] squares lib
-- [ ] view models lib (logic)
+- [?] squares lib
+- [x] view models lib (logic)
 - [ ] junit asserts lib
 - [ ] dialogs lib semantics
 
