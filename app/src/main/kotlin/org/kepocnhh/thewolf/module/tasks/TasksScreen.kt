@@ -27,12 +27,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.flow.StateFlow
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.entity.YMD
-import org.kepocnhh.thewolf.util.compose.Squares
-import sp.kx.logics.Logics
+import sp.ax.jc.squares.Squares
 
 @Composable
 private fun Text(text: String) {

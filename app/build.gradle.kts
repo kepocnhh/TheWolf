@@ -136,4 +136,5 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.compose.foundation:foundation:${Version.Android.compose}")
     implementation("com.github.kepocnhh:Logics:0.1.3-SNAPSHOT")
+    implementation("com.github.kepocnhh:ComposeSquares:0.0.1u-SNAPSHOT")
 }

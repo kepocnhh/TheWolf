@@ -11,6 +11,9 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.module.app.Colors
@@ -21,6 +24,8 @@ import org.kepocnhh.thewolf.provider.Contexts
 import org.kepocnhh.thewolf.provider.LocalDataProvider
 import org.kepocnhh.thewolf.util.compose.LocalOnBackPressedDispatcher
 import org.kepocnhh.thewolf.util.compose.toPaddings
+import sp.ax.jc.squares.LocalSquaresStyle
+import sp.ax.jc.squares.SquaresStyle
 import sp.kx.logics.Logics
 import sp.kx.logics.LogicsFactory
 import sp.kx.logics.LogicsProvider
@@ -58,9 +63,17 @@ internal class App : Application() {
                 ColorsType.LIGHT -> Colors.Light
             }
             val insets = LocalView.current.rootWindowInsets.toPaddings()
+            val injection = checkNotNull(_injection) { "No injection!" }
             CompositionLocalProvider(
                 LocalColors provides colors,
                 LocalInsets provides insets,
+                LocalSquaresStyle provides SquaresStyle(
+                    color = colors.foreground,
+                    squareSize = DpSize(width = 32.dp, height = 32.dp),
+                    paddingOffset = DpOffset(x = 16.dp, y = 16.dp),
+                    cornerRadius = 8.dp,
+                    backgroundContext = injection.contexts.default,
+                ),
                 LocalOnBackPressedDispatcher provides onBackPressedDispatcher,
                 content = content,
             )
