@@ -49,17 +49,9 @@ internal class TasksLogics(
         _state.emit(State(groups = groups))
     }
 
-    fun addTask(
-        title: String,
-        dateTime: Duration,
-    ) = launch {
+    fun addTask(factory: TaskFactory) = launch {
         val tasks = withContext(injection.contexts.default) {
-            val task = Task(
-                id = UUID.randomUUID(),
-                title = title,
-                isChecked = false,
-                dateTime = dateTime,
-            )
+            val task = factory.getTask(id = UUID.randomUUID())
             injection.locals.tasks + task
         }
         val groups = withContext(injection.contexts.default) {

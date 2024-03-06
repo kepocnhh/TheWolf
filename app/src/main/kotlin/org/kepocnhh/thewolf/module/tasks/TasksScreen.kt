@@ -4,10 +4,12 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,11 +22,15 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.kepocnhh.thewolf.App
@@ -108,7 +114,10 @@ private fun DateItem(item: YMD) {
 }
 
 @Composable
-private fun TasksScreen(state: TasksLogics.State) {
+private fun TasksScreen(
+    state: TasksLogics.State,
+    onNewTask: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -145,6 +154,21 @@ private fun TasksScreen(state: TasksLogics.State) {
                 }
             }
         }
+        BasicText(
+            modifier = Modifier
+                .padding(
+                    bottom = insets.calculateBottomPadding() + 8.dp,
+                    end = insets.calculateEndPadding(LayoutDirection.Ltr) + 8.dp
+                )
+                .background(Color.Black)
+                .align(Alignment.BottomEnd)
+                .clickable(onClick = onNewTask)
+                .padding(8.dp),
+            text = "new task",
+            style = TextStyle(
+                color = Color.White,
+            ),
+        ) // todo
     }
 }
 
@@ -160,8 +184,31 @@ internal fun TasksScreen() {
         LaunchedEffect(Unit) {
             if (state == null) logics.requestState()
         }
+        val newTaskState = remember { mutableStateOf(false) }
         if (state != null) {
-            TasksScreen(state)
+            TasksScreen(
+                state = state,
+                onNewTask = {
+                    newTaskState.value = true
+                },
+            )
+            AnimatedVisibility(
+                modifier = Modifier
+                    .align(Alignment.Center),
+                enter = fadeIn(),
+                exit = fadeOut(),
+                visible = newTaskState.value,
+            ) {
+                NewTaskScreen(
+                    onBack = {
+                        newTaskState.value = false
+                    },
+                    onNewTask = { factory ->
+                        logics.addTask(factory)
+                        newTaskState.value = false
+                    },
+                )
+            }
         }
         AnimatedVisibility(
             modifier = Modifier
