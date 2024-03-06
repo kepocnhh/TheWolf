@@ -30,7 +30,9 @@ import androidx.compose.ui.unit.sp
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.entity.YMD
+import org.kepocnhh.thewolf.util.calendarOf
 import sp.ax.jc.squares.Squares
+import java.util.Calendar
 
 @Composable
 private fun Text(text: String) {
@@ -62,11 +64,14 @@ private fun TaskItem(item: Task) {
                 .fillMaxSize()
                 .padding(horizontal = 32.dp),
         ) {
+            val calendar = calendarOf(dateTime = item.dateTime)
+            val dateText = "${calendar[Calendar.YEAR]}.${calendar[Calendar.MONTH] + 1}.${calendar[Calendar.DAY_OF_MONTH]}"
+            val timeText = "${calendar[Calendar.HOUR]}:${calendar[Calendar.MINUTE]}:${calendar[Calendar.SECOND]}"
             BasicText(
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentHeight(),
-                text = item.title,
+                text = item.title + " $dateText/$timeText", // todo date/time
                 style = TextStyle(
                     color = App.Theme.colors.text,
                     textAlign = TextAlign.Start,
@@ -122,7 +127,7 @@ private fun TasksScreen(state: TasksLogics.State) {
             contentPadding = contentPadding,
             verticalArrangement = Arrangement.spacedBy(itemsPadding, itemsAlign),
         ) {
-            val dates = state.groups.keys
+            val dates = state.groups.keys.sorted()
             for (date in dates) {
                 val tasks = state.groups[date].orEmpty()
                 if (tasks.isNotEmpty()) {

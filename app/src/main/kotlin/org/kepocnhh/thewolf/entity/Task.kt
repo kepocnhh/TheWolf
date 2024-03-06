@@ -7,5 +7,5 @@ internal data class Task(
     val id: UUID,
     val title: String,
     val isChecked: Boolean,
-    val date: Duration,
+    val dateTime: Duration, // todo UTC-0
 )

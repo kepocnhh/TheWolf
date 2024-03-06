@@ -95,12 +95,20 @@ internal class App : Application() {
             ),
             locals = MockLocalDataProvider(
                 themeState = ThemeState(colorsType = ColorsType.AUTO),
-                tasks = (1..30).map { index ->
+//                tasks = (1..30).map { index ->
+//                    Task(
+//                        id = UUID.randomUUID(),
+//                        title = "task #$index",
+//                        isChecked = true,
+//                        date = System.currentTimeMillis().milliseconds - 48.hours + (index * 6).hours,
+//                    )
+//                },
+                tasks = (1..4).map { number ->
                     Task(
                         id = UUID.randomUUID(),
-                        title = "task #$index",
+                        title = "task #$number",
                         isChecked = true,
-                        date = System.currentTimeMillis().milliseconds - 48.hours + (index * 6).hours,
+                        dateTime = System.currentTimeMillis().milliseconds + number.hours,
                     )
                 },
             )
