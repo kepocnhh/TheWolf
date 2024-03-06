@@ -2,7 +2,6 @@ package org.kepocnhh.thewolf.util
 
 import org.kepocnhh.thewolf.entity.YMD
 import java.util.Calendar
-import java.util.TimeZone
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -24,6 +23,12 @@ internal fun calendarOf(
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = dateTime.inWholeMilliseconds
     return calendar
+}
+
+internal fun Calendar.setDateTime(
+    dateTime: Duration,
+) {
+    timeInMillis = dateTime.inWholeMilliseconds
 }
 
 internal fun Calendar.toYMD(): YMD {
