@@ -1,8 +1,5 @@
 package org.kepocnhh.thewolf.module.tasks
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.entity.Task
+import sp.ax.jc.animations.tween.fade.FadeVisibility
+import sp.ax.jc.animations.tween.slide.SlideHVisibility
 import sp.ax.jc.squares.Squares
 import java.util.Calendar
 
@@ -142,11 +141,12 @@ internal fun TasksScreen() {
                     newTaskState.value = true
                 },
             )
-            AnimatedVisibility(
-                modifier = Modifier
-                    .align(Alignment.Center),
-                enter = fadeIn(),
-                exit = fadeOut(),
+            FadeVisibility(
+                visible = newTaskState.value,
+            ) {
+                Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.75f)))
+            }
+            SlideHVisibility(
                 visible = newTaskState.value,
             ) {
                 NewTaskScreen(
@@ -160,11 +160,9 @@ internal fun TasksScreen() {
                 )
             }
         }
-        AnimatedVisibility(
+        FadeVisibility(
             modifier = Modifier
                 .align(Alignment.Center),
-            enter = fadeIn(),
-            exit = fadeOut(),
             visible = state == null,
         ) {
             Squares()

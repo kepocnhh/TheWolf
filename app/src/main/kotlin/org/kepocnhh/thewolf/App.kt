@@ -24,6 +24,8 @@ import org.kepocnhh.thewolf.provider.Contexts
 import org.kepocnhh.thewolf.provider.LocalDataProvider
 import org.kepocnhh.thewolf.util.compose.LocalOnBackPressedDispatcher
 import org.kepocnhh.thewolf.util.compose.toPaddings
+import sp.ax.jc.animations.style.LocalTweenStyle
+import sp.ax.jc.animations.style.TweenStyle
 import sp.ax.jc.squares.LocalSquaresStyle
 import sp.ax.jc.squares.SquaresStyle
 import sp.kx.logics.Logics
@@ -33,8 +35,10 @@ import sp.kx.logics.contains
 import sp.kx.logics.get
 import sp.kx.logics.remove
 import java.util.UUID
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 internal class App : Application() {
     object Theme {
@@ -67,6 +71,7 @@ internal class App : Application() {
             CompositionLocalProvider(
                 LocalColors provides colors,
                 LocalInsets provides insets,
+                LocalOnBackPressedDispatcher provides onBackPressedDispatcher,
                 LocalSquaresStyle provides SquaresStyle(
                     color = colors.foreground,
                     squareSize = DpSize(width = 32.dp, height = 32.dp),
@@ -74,7 +79,9 @@ internal class App : Application() {
                     cornerRadius = 8.dp,
                     backgroundContext = injection.contexts.default,
                 ),
-                LocalOnBackPressedDispatcher provides onBackPressedDispatcher,
+                LocalTweenStyle provides LocalTweenStyle.current.copy(
+                    duration = 0.5.seconds,
+                ),
                 content = content,
             )
         }
@@ -94,7 +101,10 @@ internal class App : Application() {
                 default = Dispatchers.Default,
             ),
             locals = MockLocalDataProvider(
-                themeState = ThemeState(colorsType = ColorsType.AUTO),
+                themeState = ThemeState(
+                    colorsType = ColorsType.AUTO,
+//                    colorsType = ColorsType.DARK, // todo
+                ),
 //                tasks = (1..30).map { index ->
 //                    Task(
 //                        id = UUID.randomUUID(),
