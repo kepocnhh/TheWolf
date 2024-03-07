@@ -29,7 +29,7 @@ private fun TextField(text: String) {
     Box(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .background(App.Theme.colors.secondary, RoundedCornerShape(32.dp))
+            .background(App.Theme.colors.basement, RoundedCornerShape(32.dp))
             .fillMaxWidth(),
     ) {
         BasicText(

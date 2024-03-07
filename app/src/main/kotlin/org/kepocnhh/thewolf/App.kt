@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.module.app.Colors
@@ -26,6 +27,9 @@ import org.kepocnhh.thewolf.util.compose.LocalOnBackPressedDispatcher
 import org.kepocnhh.thewolf.util.compose.toPaddings
 import sp.ax.jc.animations.style.LocalTweenStyle
 import sp.ax.jc.animations.style.TweenStyle
+import sp.ax.jc.keyboard.KeyboardColors
+import sp.ax.jc.keyboard.KeyboardStyle
+import sp.ax.jc.keyboard.LocalKeyboardStyle
 import sp.ax.jc.squares.LocalSquaresStyle
 import sp.ax.jc.squares.SquaresStyle
 import sp.kx.logics.Logics
@@ -81,6 +85,14 @@ internal class App : Application() {
                 ),
                 LocalTweenStyle provides LocalTweenStyle.current.copy(
                     duration = 0.5.seconds,
+                ),
+                LocalKeyboardStyle provides KeyboardStyle(
+                    fontSize = 15.sp,
+                    colors = KeyboardColors(
+                        text = colors.text,
+                        pressed = colors.text.copy(alpha = 0.25f),
+                    ),
+                    corners = 16.dp,
                 ),
                 content = content,
             )
