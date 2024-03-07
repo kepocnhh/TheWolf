@@ -4,60 +4,41 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import org.kepocnhh.thewolf.entity.Task
-import org.kepocnhh.thewolf.entity.YMD
 import org.kepocnhh.thewolf.module.app.Injection
-import org.kepocnhh.thewolf.util.calendarOfToday
-import org.kepocnhh.thewolf.util.duration
-import org.kepocnhh.thewolf.util.setDateTime
-import org.kepocnhh.thewolf.util.toYMD
 import sp.kx.logics.Logics
 import java.util.UUID
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class TasksLogics(
     private val injection: Injection,
 ) : Logics(injection.contexts.main) {
     data class State(
-        val groups: Map<YMD, List<Task>>,
+        val tasks: List<Task>,
     )
 
     private val _state = MutableStateFlow<State?>(null)
     val state = _state.asStateFlow()
 
-    private fun getTaskGroups(tasks: List<Task>): Map<YMD, List<Task>> {
-        val calendar = calendarOfToday(
-            hours = 0,
-            minutes = 0,
-            milliseconds = 0,
-        )
-        val minTime = calendar.duration
-        return tasks.filter { task ->
-            minTime < task.dateTime
-        }.groupBy { task ->
-            calendar.setDateTime(dateTime = task.dateTime)
-            calendar.toYMD()
-        }.mapValues { (_, tasks) ->
-            tasks.sortedBy { it.dateTime }
-        }
-    }
-
     fun requestState() = launch {
-        val groups = withContext(injection.contexts.default) {
+        val tasks = withContext(injection.contexts.default) {
 //            delay(2.seconds) // todo
-            getTaskGroups(tasks = injection.locals.tasks)
+            injection.locals.tasks
         }
-        _state.emit(State(groups = groups))
+        _state.emit(State(tasks = tasks))
     }
 
-    fun addTask(factory: TaskFactory) = launch {
+    fun addTask(title: String) = launch {
         val tasks = withContext(injection.contexts.default) {
-            val task = factory.getTask(id = UUID.randomUUID())
+            val task = Task(
+                id = UUID.randomUUID(),
+                title = title,
+                created = System.currentTimeMillis().milliseconds,
+            )
             injection.locals.tasks + task
         }
-        val groups = withContext(injection.contexts.default) {
+        withContext(injection.contexts.default) {
             injection.locals.tasks = tasks
-            getTaskGroups(tasks = tasks)
         }
-        _state.emit(State(groups = groups))
+        _state.emit(State(tasks = tasks))
     }
 }

@@ -6,6 +6,5 @@ import kotlin.time.Duration
 internal data class Task(
     val id: UUID,
     val title: String,
-    val isChecked: Boolean,
-    val dateTime: Duration, // todo UTC-0
+    val created: Duration, // todo UTC-0
 )

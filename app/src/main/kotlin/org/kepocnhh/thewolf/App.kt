@@ -107,8 +107,7 @@ internal class App : Application() {
                     Task(
                         id = UUID.randomUUID(),
                         title = "task #$number",
-                        isChecked = true,
-                        dateTime = System.currentTimeMillis().milliseconds + number.hours,
+                        created = System.currentTimeMillis().milliseconds + number.hours,
                     )
                 },
             )

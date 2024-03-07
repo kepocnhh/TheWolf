@@ -11,7 +11,7 @@ import org.kepocnhh.thewolf.util.compose.BackHandler
 @Composable
 internal fun NewTaskScreen(
     onBack: () -> Unit,
-    onNewTask: (TaskFactory) -> Unit,
+    onNewTask: (title: String) -> Unit,
 ) {
     Box(
         modifier = Modifier

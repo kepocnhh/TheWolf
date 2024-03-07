@@ -35,26 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.entity.Task
-import org.kepocnhh.thewolf.entity.YMD
-import org.kepocnhh.thewolf.util.calendarOf
 import sp.ax.jc.squares.Squares
 import java.util.Calendar
-
-@Composable
-private fun Text(text: String) {
-    val textStyle = TextStyle(
-        color = App.Theme.colors.text,
-        textAlign = TextAlign.Start,
-    )
-    BasicText(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .wrapContentHeight(),
-        text = text,
-        style = textStyle,
-    )
-}
 
 @Composable
 private fun TaskItem(item: Task) {
@@ -70,7 +52,8 @@ private fun TaskItem(item: Task) {
                 .fillMaxSize()
                 .padding(horizontal = 32.dp),
         ) {
-            val calendar = calendarOf(dateTime = item.dateTime)
+            val calendar = remember { Calendar.getInstance() }
+            calendar.timeInMillis = item.created.inWholeMilliseconds
             val dateText = "${calendar[Calendar.YEAR]}.${calendar[Calendar.MONTH] + 1}.${calendar[Calendar.DAY_OF_MONTH]}"
             val timeText = "${calendar[Calendar.HOUR]}:${calendar[Calendar.MINUTE]}:${calendar[Calendar.SECOND]}"
             BasicText(
@@ -88,28 +71,6 @@ private fun TaskItem(item: Task) {
                 maxLines = 1,
             )
         }
-    }
-}
-
-@Composable
-private fun DateItem(item: YMD) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(24.dp)
-            .padding(horizontal = 16.dp),
-    ) {
-        BasicText(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentHeight(),
-            text = String.format("%02d.%02d.%02d", item.year, item.month + 1, item.day),
-            style = TextStyle(
-                color = App.Theme.colors.text,
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
-            ),
-        )
     }
 }
 
@@ -136,22 +97,11 @@ private fun TasksScreen(
             contentPadding = contentPadding,
             verticalArrangement = Arrangement.spacedBy(itemsPadding, itemsAlign),
         ) {
-            val dates = state.groups.keys.sorted()
-            for (date in dates) {
-                val tasks = state.groups[date].orEmpty()
-                if (tasks.isNotEmpty()) {
-                    item(
-                        key = date.toString(),
-                    ) {
-                        DateItem(item = date)
-                    }
-                    items(
-                        items = tasks,
-                        key = Task::id,
-                    ) { task ->
-                        TaskItem(item = task)
-                    }
-                }
+            items(
+                items = state.tasks,
+                key = Task::id,
+            ) { task ->
+                TaskItem(item = task)
             }
         }
         BasicText(
@@ -203,8 +153,8 @@ internal fun TasksScreen() {
                     onBack = {
                         newTaskState.value = false
                     },
-                    onNewTask = { factory ->
-                        logics.addTask(factory)
+                    onNewTask = { title: String ->
+                        logics.addTask(title = title)
                         newTaskState.value = false
                     },
                 )
