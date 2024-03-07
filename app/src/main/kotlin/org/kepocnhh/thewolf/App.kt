@@ -10,6 +10,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
@@ -73,9 +74,10 @@ internal class App : Application() {
             val insets = LocalView.current.rootWindowInsets.toPaddings()
             val injection = checkNotNull(_injection) { "No injection!" }
             CompositionLocalProvider(
+                LocalTextInputService provides null,
+                LocalOnBackPressedDispatcher provides onBackPressedDispatcher,
                 LocalColors provides colors,
                 LocalInsets provides insets,
-                LocalOnBackPressedDispatcher provides onBackPressedDispatcher,
                 LocalSquaresStyle provides SquaresStyle(
                     color = colors.foreground,
                     squareSize = DpSize(width = 32.dp, height = 32.dp),
