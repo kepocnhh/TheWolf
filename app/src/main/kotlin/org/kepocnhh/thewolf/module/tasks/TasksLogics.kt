@@ -22,7 +22,7 @@ internal class TasksLogics(
     fun requestState() = launch {
         val tasks = withContext(injection.contexts.default) {
 //            delay(2.seconds) // todo
-            injection.locals.tasks
+            injection.locals.tasks.sortedBy { it.created }
         }
         _state.emit(State(tasks = tasks))
     }
@@ -34,7 +34,7 @@ internal class TasksLogics(
                 title = title,
                 created = System.currentTimeMillis().milliseconds,
             )
-            injection.locals.tasks + task
+            (injection.locals.tasks + task).sortedBy { it.created }
         }
         withContext(injection.contexts.default) {
             injection.locals.tasks = tasks
