@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.util.compose.BackHandler
+import org.kepocnhh.thewolf.util.compose.plus
 import sp.ax.jc.animations.tween.fade.FadeVisibility
 import sp.ax.jc.keyboard.Keyboard
 import java.lang.StringBuilder
@@ -139,15 +140,7 @@ internal fun NewTaskScreen(
                     modifier = Modifier
                         .fillMaxWidth(),
                     onClick = { char ->
-                        val value = textFieldValueState.value
-                        val selection = value.selection
-                        val text = StringBuilder(value.text)
-                            .replace(selection.start, selection.end, char.toString())
-                            .toString()
-                        textFieldValueState.value = value.copy(
-                            text = text,
-                            selection = TextRange(selection.start + 1, selection.start + 1),
-                        )
+                        textFieldValueState.value = textFieldValueState.value + char
                     },
                 )
             }
