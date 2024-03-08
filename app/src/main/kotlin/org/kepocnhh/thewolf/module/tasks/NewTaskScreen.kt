@@ -220,6 +220,7 @@ internal fun NewTaskScreen(
                 initialOffsetY = { it + bottomPx },
                 targetOffsetY = { it + bottomPx },
             ) {
+                // todo backspace
                 Keyboard(
                     modifier = Modifier
                         .fillMaxWidth(),
