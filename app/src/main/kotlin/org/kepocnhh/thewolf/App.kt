@@ -95,7 +95,7 @@ internal class App : Application() {
                         pressed = colors.text.copy(alpha = 0.25f),
                     ),
                     corners = 16.dp,
-                    backspaceIconId = android.R.drawable.ic_input_delete,
+                    backspaceIconId = R.drawable.backspace,
                 ),
                 content = content,
             )
