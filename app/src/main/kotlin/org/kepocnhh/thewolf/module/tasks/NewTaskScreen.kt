@@ -34,6 +34,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.util.compose.BackHandler
+import org.kepocnhh.thewolf.util.compose.backspace
+import org.kepocnhh.thewolf.util.compose.clear
 import org.kepocnhh.thewolf.util.compose.plus
 import org.kepocnhh.thewolf.util.compose.toPx
 import sp.ax.jc.animations.tween.slide.vertical.SlideVVisibility
@@ -54,6 +56,21 @@ private fun TextField(
             .background(App.Theme.colors.basement, RoundedCornerShape(32.dp))
             .fillMaxWidth(),
     ) {
+        if (value.text.isEmpty()) {
+            BasicText(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 24.dp,
+                        vertical = 16.dp,
+                    ),
+                text = "My new task",
+                style = TextStyle(
+                    color = App.Theme.colors.secondary,
+                    fontSize = 17.sp,
+                ),
+            )
+        }
         BasicTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,21 +93,6 @@ private fun TextField(
             ),
             singleLine = true,
         )
-        if (value.text.isEmpty()) {
-            BasicText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 24.dp,
-                        vertical = 16.dp,
-                    ),
-                text = "My new task",
-                style = TextStyle(
-                    color = App.Theme.colors.secondary,
-                    fontSize = 17.sp,
-                ),
-            )
-        }
     }
 }
 
@@ -220,13 +222,19 @@ internal fun NewTaskScreen(
                 initialOffsetY = { it + bottomPx },
                 targetOffsetY = { it + bottomPx },
             ) {
-                // todo backspace
                 Keyboard(
                     modifier = Modifier
                         .fillMaxWidth(),
                     onClick = { char ->
                         if (titleState.value.text.length < maxLength) {
                             titleState.value += char
+                        }
+                    },
+                    onBackspace = { isLongClick: Boolean ->
+                        if (isLongClick) {
+                            titleState.clear()
+                        } else {
+                            titleState.backspace()
                         }
                     },
                 )
