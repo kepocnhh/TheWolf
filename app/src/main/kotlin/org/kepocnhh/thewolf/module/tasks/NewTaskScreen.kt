@@ -76,6 +76,21 @@ private fun TextField(
             ),
             singleLine = true,
         )
+        if (value.text.isEmpty()) {
+            BasicText(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 24.dp,
+                        vertical = 16.dp,
+                    ),
+                text = "My new task",
+                style = TextStyle(
+                    color = App.Theme.colors.secondary,
+                    fontSize = 17.sp,
+                ),
+            )
+        }
     }
 }
 
