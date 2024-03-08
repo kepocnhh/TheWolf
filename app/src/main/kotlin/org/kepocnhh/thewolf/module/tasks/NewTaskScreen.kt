@@ -200,7 +200,7 @@ internal fun NewTaskScreen(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
                         .clickable(enabled = isReady) {
-                            // todo
+                            onNewTask(titleState.value.text)
                         }
                         .padding(
                             horizontal = 16.dp,
