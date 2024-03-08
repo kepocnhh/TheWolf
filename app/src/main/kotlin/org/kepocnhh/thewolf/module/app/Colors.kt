@@ -8,6 +8,7 @@ internal class Colors private constructor(
     val secondary: Color,
     val foreground: Color,
     val text: Color,
+    val primary: Color,
 ) {
     companion object {
         val Dark = Colors(
@@ -16,6 +17,7 @@ internal class Colors private constructor(
             secondary = Color(0xff2f2f2f),
             foreground = Color(0xffefefef),
             text = Color(0xffffffff),
+            primary = Color(0xff1E88E5),
         )
         val Light = Colors(
             basement = Color(0xffffffff),
@@ -23,6 +25,7 @@ internal class Colors private constructor(
             secondary = Color(0xffdfdfdf),
             foreground = Color(0xff1f1f1f),
             text = Color(0xff000000),
+            primary = Color(0xff1E88E5),
         )
     }
 }

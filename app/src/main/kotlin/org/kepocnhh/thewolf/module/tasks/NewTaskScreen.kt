@@ -1,13 +1,16 @@
 package org.kepocnhh.thewolf.module.tasks
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
@@ -16,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
@@ -31,6 +35,7 @@ import kotlinx.coroutines.withContext
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.util.compose.BackHandler
 import org.kepocnhh.thewolf.util.compose.plus
+import org.kepocnhh.thewolf.util.compose.toPx
 import sp.ax.jc.animations.tween.slide.vertical.SlideVVisibility
 import sp.ax.jc.keyboard.Keyboard
 import kotlin.time.Duration.Companion.seconds
@@ -99,6 +104,10 @@ private fun TextField(text: String) {
     }
 }
 
+private fun isReady(title: String): Boolean {
+    return title.isNotBlank()
+}
+
 @Composable
 internal fun NewTaskScreen(
     onBack: () -> Unit,
@@ -110,7 +119,7 @@ internal fun NewTaskScreen(
             .background(App.Theme.colors.background),
     ) {
         val insets = App.Theme.insets
-        val textFieldValueState = remember { mutableStateOf(TextFieldValue()) }
+        val titleState = remember { mutableStateOf(TextFieldValue()) }
         val isFocusedState = remember { mutableStateOf(false) }
         val focusRequester = remember { FocusRequester() }
         BackHandler {
@@ -128,11 +137,13 @@ internal fun NewTaskScreen(
                 focusRequester.requestFocus()
             }
         }
+        val maxLength = 24
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
                     top = insets.calculateTopPadding() + 16.dp,
+                    bottom = insets.calculateBottomPadding(),
                 )
         ) {
             BasicText(
@@ -148,12 +159,11 @@ internal fun NewTaskScreen(
                     fontSize = 15.sp,
                 ),
             )
-            val maxLength = 24
             TextField(
-                value = textFieldValueState.value,
+                value = titleState.value,
                 maxLength = maxLength,
                 onValueChange = {
-                    textFieldValueState.value = it
+                    titleState.value = it
                 },
                 onFocusChanged = {
                     isFocusedState.value = it.isFocused
@@ -161,16 +171,46 @@ internal fun NewTaskScreen(
                 focusRequester = focusRequester,
             )
             Spacer(modifier = Modifier.weight(1f))
-            SlideVVisibility(visible = isFocusedState.value) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 16.dp,
+                        vertical = 8.dp,
+                    ),
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                val isReady = isReady(title = titleState.value.text)
+                BasicText(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable(enabled = isReady) {
+                            // todo
+                        }
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 8.dp,
+                        )
+                        .wrapContentHeight(),
+                    text = "done", // todo
+                    style = TextStyle(
+                        color = if (isReady) App.Theme.colors.primary else App.Theme.colors.secondary,
+                        fontSize = 15.sp,
+                    ),
+                )
+            }
+            val bottomPx = insets.calculateBottomPadding().toPx().toInt()
+            SlideVVisibility(
+                visible = isFocusedState.value,
+                initialOffsetY = { it + bottomPx },
+                targetOffsetY = { it + bottomPx },
+            ) {
                 Keyboard(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            bottom = insets.calculateBottomPadding() + 4.dp,
-                        ),
+                        .fillMaxWidth(),
                     onClick = { char ->
-                        if (textFieldValueState.value.text.length < maxLength) {
-                            textFieldValueState.value += char
+                        if (titleState.value.text.length < maxLength) {
+                            titleState.value += char
                         }
                     },
                 )
