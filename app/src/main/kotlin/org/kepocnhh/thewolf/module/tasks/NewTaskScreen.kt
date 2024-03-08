@@ -1,5 +1,7 @@
 package org.kepocnhh.thewolf.module.tasks
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.core.Easing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -28,14 +30,19 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.util.compose.BackHandler
 import org.kepocnhh.thewolf.util.compose.plus
+import sp.ax.jc.animations.style.LocalTweenStyle
 import sp.ax.jc.animations.tween.fade.FadeVisibility
+import sp.ax.jc.animations.tween.slide.SlideHVisibility
+import sp.ax.jc.animations.tween.slide.SlideVisibility
 import sp.ax.jc.keyboard.Keyboard
 import java.lang.StringBuilder
+import kotlin.time.Duration
 
 @Composable
 private fun TextField(
@@ -96,6 +103,31 @@ private fun TextField(text: String) {
 }
 
 @Composable
+private fun SlideVVisibility(
+    visible: Boolean,
+    modifier: Modifier = Modifier,
+    label: String = "SlideHVisibility",
+    duration: Duration = LocalTweenStyle.current.duration,
+    delay: Duration = LocalTweenStyle.current.delay,
+    easing: Easing = LocalTweenStyle.current.easing,
+    initialOffsetY: (fullHeight: Int) -> Int = { it },
+    targetOffsetY: (fullHeight: Int) -> Int = { it },
+    content: @Composable AnimatedVisibilityScope.() -> Unit,
+) {
+    SlideVisibility(
+        visible = visible,
+        modifier = modifier,
+        label = label,
+        duration = duration,
+        delay = delay,
+        easing = easing,
+        initialOffset = { IntOffset(x = 0, y = initialOffsetY(it.height)) },
+        targetOffset = { IntOffset(x = 0, y = targetOffsetY(it.height)) },
+        content = content,
+    )
+}
+
+@Composable
 internal fun NewTaskScreen(
     onBack: () -> Unit,
     onNewTask: (title: String) -> Unit,
@@ -121,7 +153,6 @@ internal fun NewTaskScreen(
                 .fillMaxSize()
                 .padding(
                     top = insets.calculateTopPadding() + 16.dp,
-                    bottom = insets.calculateBottomPadding() + 4.dp,
                 )
         ) {
             TextField(
@@ -135,15 +166,27 @@ internal fun NewTaskScreen(
                 focusRequester = focusRequester,
             )
             Spacer(modifier = Modifier.weight(1f))
-            FadeVisibility(visible = isFocusedState.value) {
+            SlideVVisibility(visible = isFocusedState.value) {
                 Keyboard(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(
+                            bottom = insets.calculateBottomPadding() + 4.dp,
+                        ),
                     onClick = { char ->
-                        textFieldValueState.value = textFieldValueState.value + char
+                        textFieldValueState.value += char
                     },
                 )
             }
+//            FadeVisibility(visible = isFocusedState.value) {
+//                Keyboard(
+//                    modifier = Modifier
+//                        .fillMaxWidth(),
+//                    onClick = { char ->
+//                        textFieldValueState.value += char
+//                    },
+//                )
+//            }
         }
     }
 }
