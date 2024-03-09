@@ -1,8 +1,12 @@
 {
   "data": {
     "auto": "Auto",
+    "colorsDark": "Dark",
+    "colorsLight": "Light",
     "language": "en",
     "languageName": "English",
-    "settingsLanguage": "Language"
+    "settingsColors": "Colors",
+    "settingsLanguage": "Language",
+    "settingsVersion": "Version"
   }
 }

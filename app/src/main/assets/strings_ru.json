@@ -1,8 +1,12 @@
 {
   "data": {
     "auto": "По умолчанию",
+    "colorsDark": "Тёмные",
+    "colorsLight": "Светлые",
     "language": "ru",
     "languageName": "Русский",
-    "settingsLanguage": "Язык"
+    "settingsColors": "Цвета",
+    "settingsLanguage": "Язык",
+    "settingsVersion": "Версия"
   }
 }

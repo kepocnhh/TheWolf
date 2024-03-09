@@ -38,8 +38,13 @@ import org.kepocnhh.thewolf.R
 import org.kepocnhh.thewolf.module.app.ColorsType
 import org.kepocnhh.thewolf.util.compose.ColorIndication
 
+@Composable
 private fun getText(colorsType: ColorsType): String {
-    return colorsType.name // todo
+    return when (colorsType) {
+        ColorsType.Auto -> App.Theme.strings.auto
+        ColorsType.Dark -> App.Theme.strings.colorsDark
+        ColorsType.Light -> App.Theme.strings.colorsLight
+    }
 }
 
 @DrawableRes
@@ -171,7 +176,7 @@ internal fun SettingsColors(
                         fontSize = 13.sp,
                         color = App.Theme.colors.text,
                     ),
-                    text = "Colors", // todo
+                    text = App.Theme.strings.settingsColors,
                 )
                 BasicText(
                     modifier = Modifier.align(Alignment.BottomStart),

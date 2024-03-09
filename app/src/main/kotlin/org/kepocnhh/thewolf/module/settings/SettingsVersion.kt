@@ -48,7 +48,7 @@ internal fun SettingsVersion(
                         fontSize = 13.sp,
                         color = App.Theme.colors.text,
                     ),
-                    text = "Version", // todo
+                    text = App.Theme.strings.settingsVersion,
                 )
                 BasicText(
                     modifier = Modifier.align(Alignment.BottomStart),
