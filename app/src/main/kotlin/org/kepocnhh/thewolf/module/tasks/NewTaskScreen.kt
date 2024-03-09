@@ -147,8 +147,8 @@ internal fun NewTaskScreen(
             }
         }
         LaunchedEffect(Unit) {
-            withContext(Dispatchers.Default) {
-                delay(0.75.seconds)
+            withContext(App.contexts.default) {
+                delay(0.5.seconds)
             }
             if (!isFocusedState.value) {
                 focusRequester.requestFocus()

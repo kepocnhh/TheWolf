@@ -61,18 +61,23 @@ internal class App : Application() {
             get() = LocalInsets.current
 
         @Composable
+        fun ColorsType.getColors(): Colors {
+            return when (this) {
+                ColorsType.Auto -> if (isSystemInDarkTheme()) Colors.Dark else Colors.Light
+                ColorsType.Dark -> Colors.Dark
+                ColorsType.Light -> Colors.Light
+            }
+        }
+
+        @Composable
         fun Composition(
+            contexts: Contexts,
             onBackPressedDispatcher: OnBackPressedDispatcher,
             themeState: ThemeState,
             content: @Composable () -> Unit,
         ) {
-            val colors = when (themeState.colorsType) {
-                ColorsType.AUTO -> if (isSystemInDarkTheme()) Colors.Dark else Colors.Light
-                ColorsType.DARK -> Colors.Dark
-                ColorsType.LIGHT -> Colors.Light
-            }
+            val colors = themeState.colorsType.getColors()
             val insets = LocalView.current.rootWindowInsets.toPaddings()
-            val injection = checkNotNull(_injection) { "No injection!" }
             CompositionLocalProvider(
                 LocalTextInputService provides null,
                 LocalOnBackPressedDispatcher provides onBackPressedDispatcher,
@@ -83,7 +88,7 @@ internal class App : Application() {
                     squareSize = DpSize(width = 32.dp, height = 32.dp),
                     paddingOffset = DpOffset(x = 16.dp, y = 16.dp),
                     cornerRadius = 8.dp,
-                    backgroundContext = injection.contexts.default,
+                    backgroundContext = contexts.default,
                 ),
                 LocalTweenStyle provides LocalTweenStyle.current.copy(
                     duration = 0.5.seconds,
@@ -117,7 +122,7 @@ internal class App : Application() {
             ),
             locals = MockLocalDataProvider(
                 themeState = ThemeState(
-                    colorsType = ColorsType.AUTO,
+                    colorsType = ColorsType.Auto,
 //                    colorsType = ColorsType.DARK, // todo
                 ),
 //                tasks = (1..30).map { index ->
@@ -151,6 +156,12 @@ internal class App : Application() {
                 }
             },
         )
+
+        val contexts: Contexts
+            get() {
+                return checkNotNull(_injection) { "No injection!" }.contexts
+            }
+
         @Composable
         inline fun <reified T : Logics> logics(label: String = T::class.java.name): T {
             val (contains, logic) = synchronized(App::class.java) {

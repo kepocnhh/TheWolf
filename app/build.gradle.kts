@@ -139,4 +139,6 @@ dependencies {
     implementation("com.github.kepocnhh:ComposeAnimations:0.1.0u-SNAPSHOT")
     implementation("com.github.kepocnhh:ComposeKeyboard:0.1.0u-SNAPSHOT")
     implementation("com.github.kepocnhh:ComposeSquares:0.0.1u-SNAPSHOT")
+    debugImplementation("androidx.compose.ui:ui-tooling:${Version.Android.compose}")
+    debugImplementation("androidx.compose.ui:ui-tooling-preview:${Version.Android.compose}")
 }

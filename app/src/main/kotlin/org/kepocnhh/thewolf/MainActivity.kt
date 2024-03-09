@@ -37,6 +37,7 @@ internal class MainActivity : AppCompatActivity() {
             }
             if (themeState != null) {
                 App.Theme.Composition(
+                    contexts = App.contexts,
                     onBackPressedDispatcher = onBackPressedDispatcher,
                     themeState = themeState,
                 ) {

@@ -54,6 +54,7 @@ import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.R
 import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.module.app.Colors
+import org.kepocnhh.thewolf.module.settings.SettingsScreen
 import org.kepocnhh.thewolf.util.compose.ColorIndication
 import sp.ax.jc.animations.tween.fade.FadeVisibility
 import sp.ax.jc.animations.tween.slide.SlideHVisibility
@@ -212,6 +213,13 @@ private fun CircleButton(
     }
 }
 
+private object TasksScreen {
+    enum class Menu {
+        NEW_TASK,
+        SETTINGS,
+    }
+}
+
 @Composable
 internal fun TasksScreen() {
     Box(
@@ -224,34 +232,43 @@ internal fun TasksScreen() {
         LaunchedEffect(Unit) {
             if (state == null) logics.requestState()
         }
-        val newTaskState = remember { mutableStateOf(false) }
+        val menuState = remember { mutableStateOf<TasksScreen.Menu?>(null) }
         if (state != null) {
             TasksScreen(
                 state = state,
                 onNewTask = {
-                    newTaskState.value = true
+                    menuState.value = TasksScreen.Menu.NEW_TASK
                 },
                 onSettings = {
-                    // todo
-                }
+                    menuState.value = TasksScreen.Menu.SETTINGS
+                },
             )
             FadeVisibility(
-                visible = newTaskState.value,
+                visible = menuState.value != null,
             ) {
                 Box(modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.75f)))
             }
             SlideHVisibility(
-                visible = newTaskState.value,
+                visible = menuState.value == TasksScreen.Menu.NEW_TASK,
             ) {
                 NewTaskScreen(
                     onBack = {
-                        newTaskState.value = false
+                        menuState.value = null
                     },
                     onNewTask = { title: String ->
                         logics.addTask(title = title)
-                        newTaskState.value = false
+                        menuState.value = null
+                    },
+                )
+            }
+            SlideHVisibility(
+                visible = menuState.value == TasksScreen.Menu.SETTINGS,
+            ) {
+                SettingsScreen(
+                    onBack = {
+                        menuState.value = null
                     },
                 )
             }
