@@ -4,21 +4,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import org.kepocnhh.thewolf.module.app.ColorsType
-import org.kepocnhh.thewolf.module.app.ColorsTypeProvider
 import org.kepocnhh.thewolf.module.app.PreviewComposition
 import org.kepocnhh.thewolf.module.app.StringsType
+import org.kepocnhh.thewolf.module.app.StringsTypeProvider
 import org.kepocnhh.thewolf.module.app.ThemeState
 
 @Composable
-private fun SettingsColorsDialogPreview(
+private fun SettingsStringsDialogPreview(
     themeState: ThemeState,
-    selected: ColorsType,
+    selected: StringsType,
+    list: List<StringsType>,
 ) {
     PreviewComposition(
         themeState = themeState,
     ) {
-        SettingsColorsDialog(
+        SettingsStringsDialog(
             selected = selected,
+            list = list,
             onSelect = {
                 // noop
             },
@@ -29,17 +31,22 @@ private fun SettingsColorsDialogPreview(
     }
 }
 
-@Preview(name = "ColorsType")
+@Preview(name = "StringsType")
 @Composable
-private fun SettingsColorsDialogColorsTypePreview(
-    @PreviewParameter(ColorsTypeProvider::class) colorsType: ColorsType,
+private fun SettingsStringsDialogStringsTypePreview(
+    @PreviewParameter(StringsTypeProvider::class) stringsType: StringsType,
 ) {
     val themeState = ThemeState(
-        colorsType = colorsType,
-        stringsType = StringsType.Auto,
+        colorsType = ColorsType.Dark,
+        stringsType = stringsType,
     )
-    SettingsColorsDialogPreview(
+    SettingsStringsDialogPreview(
         themeState = themeState,
-        selected = colorsType,
+        selected = stringsType,
+        list = listOf(
+            StringsType.Locale("en"),
+            StringsType.Locale("ru"),
+            StringsType.Auto,
+        ),
     )
 }

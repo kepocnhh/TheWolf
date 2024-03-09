@@ -52,7 +52,7 @@ private fun getIcon(colorsType: ColorsType): Int {
 }
 
 @Composable
-private fun SettingsColorRow(
+private fun SettingsColorsRow(
     modifier: Modifier,
     colorsType: ColorsType,
     isSelected: Boolean,
@@ -123,7 +123,7 @@ internal fun SettingsColorsDialog(
                 ColorsType.Dark,
                 ColorsType.Auto,
             ).forEach { colorsType ->
-                SettingsColorRow(
+                SettingsColorsRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(64.dp),
