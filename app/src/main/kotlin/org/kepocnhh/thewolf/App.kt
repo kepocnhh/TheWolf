@@ -28,6 +28,7 @@ import org.kepocnhh.thewolf.module.app.ColorsType
 import org.kepocnhh.thewolf.module.app.Injection
 import org.kepocnhh.thewolf.module.app.Strings
 import org.kepocnhh.thewolf.module.app.StringsType
+import org.kepocnhh.thewolf.module.app.StringsUtil
 import org.kepocnhh.thewolf.module.app.ThemeState
 import org.kepocnhh.thewolf.provider.Contexts
 import org.kepocnhh.thewolf.provider.LocalDataProvider
@@ -85,59 +86,12 @@ internal class App : Application() {
 
         @Composable
         fun getStrings(stringsType: StringsType): Strings {
-            return getStrings(
+            return StringsUtil.getStrings(
                 configuration = LocalConfiguration.current,
-                map = getStrings(LocalContext.current),
+                stringsMap = StringsUtil.getStringsMap(LocalContext.current),
                 stringsType = stringsType,
+                defaultLanguage = "en",
             )
-        }
-
-        private fun toStrings(json: String): Strings {
-            val root = JSONObject(json)
-            val data = root.getJSONObject("data")
-            val con = Strings::class.java.constructors.firstOrNull()
-            checkNotNull(con) { "No constructors!" }
-            val fields = Strings::class.java.declaredFields.filter { !java.lang.reflect.Modifier.isStatic(it.modifiers) }
-            val args = fields.map {
-                data.getString(it.name)
-            }.toTypedArray()
-            return con.newInstance(*args) as Strings
-        }
-
-        private fun getStrings(context: Context): Map<String, Strings> {
-            val locales = context.assets.list("")
-                ?.filter { it.matches("^strings_[a-z]{2}.json\$".toRegex()) }
-                ?.mapNotNull { name ->
-                    runCatching {
-                        context.assets.open(name).use { toStrings(it.reader().readText()) }
-                    }.getOrNull()
-                }
-            if (locales.isNullOrEmpty()) error("No locales!")
-            return locales.associateBy { it.language }
-        }
-
-        private fun getDefaultStrings(map: Map<String, Strings>): Strings {
-            return map["en"] ?: error("No default strings!")
-        }
-
-        private fun getStrings(
-            configuration: Configuration,
-            map: Map<String, Strings>,
-            stringsType: StringsType,
-        ): Strings {
-            return when (stringsType) {
-                StringsType.Auto -> {
-                    configuration
-                        .locales
-                        .get(0)
-                        ?.language
-                        ?.let(map::get)
-                        ?: getDefaultStrings(map)
-                }
-                is StringsType.Locale -> {
-                    map[stringsType.language] ?: error("No strings by \"${stringsType.language}\"!")
-                }
-            }
         }
 
         @Composable
@@ -149,12 +103,13 @@ internal class App : Application() {
         ) {
             val insets = LocalView.current.rootWindowInsets.toPaddings()
             val colors = getColors(themeState.colorsType)
-            val map = getStrings(LocalContext.current)
-            _locales = map.keys
-            val strings = getStrings(
+            val stringsMap = StringsUtil.getStringsMap(LocalContext.current)
+            _locales = stringsMap.keys
+            val strings = StringsUtil.getStrings(
                 configuration = LocalConfiguration.current,
-                map = map,
+                stringsMap = stringsMap,
                 stringsType = themeState.stringsType,
+                defaultLanguage = "en",
             )
             CompositionLocalProvider(
                 LocalTextInputService provides null,
