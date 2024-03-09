@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.coroutines.Dispatchers
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.module.app.ColorsType
@@ -31,11 +33,17 @@ private fun SettingsScreenPreview(
     }
 }
 
-@Preview(name = "foo")
+private class ColorsTypeProvider : PreviewParameterProvider<ColorsType> {
+    override val values = sequenceOf(ColorsType.Dark, ColorsType.Light)
+}
+
+@Preview(name = "ThemeState")
 @Composable
-private fun SettingsScreenFooPreview() {
+private fun SettingsScreenThemeStatePreview(
+    @PreviewParameter(ColorsTypeProvider::class) colorsType: ColorsType,
+) {
     val themeState = ThemeState(
-        colorsType = ColorsType.Light
+        colorsType = colorsType,
     )
     SettingsScreenPreview(
         themeState = themeState,

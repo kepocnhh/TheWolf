@@ -27,30 +27,34 @@ internal fun SettingsVersion(
     versionName: String,
     versionCode: Int,
 ) {
-    val textStyle = TextStyle(
-        fontSize = 15.sp,
-        color = App.Theme.colors.text,
-    )
     Box(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Yellow) // todo
                 .padding(horizontal = 16.dp)
                 .background(App.Theme.colors.secondary, RoundedCornerShape(16.dp))
-                .padding(horizontal = 16.dp),
+                .padding(
+                    horizontal = 16.dp,
+                    vertical = 12.dp,
+                ),
         ) {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f),
             ) {
                 BasicText(
-                    style = textStyle,
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        color = App.Theme.colors.text,
+                    ),
                     text = "Version", // todo
                 )
                 BasicText(
-                    style = textStyle.copy(
+                    modifier = Modifier.align(Alignment.BottomStart),
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        color = App.Theme.colors.text,
                         fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.Monospace,
                     ),
@@ -59,7 +63,9 @@ internal fun SettingsVersion(
             }
             BasicText(
                 modifier = Modifier.fillMaxHeight().wrapContentHeight(),
-                style = textStyle.copy(
+                style = TextStyle(
+                    fontSize = 17.sp,
+                    color = App.Theme.colors.text,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Monospace,
                 ),
