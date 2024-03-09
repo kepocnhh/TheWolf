@@ -70,7 +70,7 @@ private fun SettingsColorRow(
                     indication = ColorIndication.create(colors.foreground),
                     onClick = onClick,
                 )
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
         ) {
             Image(
                 modifier = Modifier
