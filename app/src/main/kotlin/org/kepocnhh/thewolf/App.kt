@@ -61,8 +61,8 @@ internal class App : Application() {
             get() = LocalInsets.current
 
         @Composable
-        fun ColorsType.getColors(): Colors {
-            return when (this) {
+        fun getColors(colorsType: ColorsType): Colors {
+            return when (colorsType) {
                 ColorsType.Auto -> if (isSystemInDarkTheme()) Colors.Dark else Colors.Light
                 ColorsType.Dark -> Colors.Dark
                 ColorsType.Light -> Colors.Light
@@ -76,7 +76,7 @@ internal class App : Application() {
             themeState: ThemeState,
             content: @Composable () -> Unit,
         ) {
-            val colors = themeState.colorsType.getColors()
+            val colors = getColors(themeState.colorsType)
             val insets = LocalView.current.rootWindowInsets.toPaddings()
             CompositionLocalProvider(
                 LocalTextInputService provides null,

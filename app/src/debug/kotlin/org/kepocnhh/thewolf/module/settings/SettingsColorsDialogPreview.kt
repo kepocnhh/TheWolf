@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.coroutines.Dispatchers
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.module.app.ColorsType
@@ -16,8 +15,9 @@ import org.kepocnhh.thewolf.module.app.ThemeState
 import org.kepocnhh.thewolf.provider.Contexts
 
 @Composable
-private fun SettingsScreenPreview(
+private fun SettingsColorsDialogPreview(
     themeState: ThemeState,
+    selected: ColorsType,
 ) {
     App.Theme.Composition(
         contexts = Contexts(main = Dispatchers.Main, default = Dispatchers.Default),
@@ -25,11 +25,14 @@ private fun SettingsScreenPreview(
         themeState = themeState,
     ) {
         Box(modifier = Modifier.background(App.Theme.colors.background)) {
-            SettingsScreen(
-                themeState = themeState,
-                onThemeState = {
+            SettingsColorsDialog(
+                selected = selected,
+                onSelect = {
                     // noop
                 },
+                onDismiss = {
+                    // noop
+                }
             )
         }
     }
@@ -37,13 +40,14 @@ private fun SettingsScreenPreview(
 
 @Preview(name = "ThemeState")
 @Composable
-private fun SettingsScreenThemeStatePreview(
+private fun SettingsColorsDialogThemeStatePreview(
     @PreviewParameter(ColorsTypeProvider::class) colorsType: ColorsType,
 ) {
     val themeState = ThemeState(
         colorsType = colorsType,
     )
-    SettingsScreenPreview(
+    SettingsColorsDialogPreview(
         themeState = themeState,
+        selected = colorsType,
     )
 }

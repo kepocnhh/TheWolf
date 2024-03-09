@@ -25,6 +25,7 @@ import org.kepocnhh.thewolf.util.compose.BackHandler
 @Composable
 internal fun SettingsScreen(
     themeState: ThemeState,
+    onThemeState: (ThemeState) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -45,6 +46,9 @@ internal fun SettingsScreen(
                         .weight(1f)
                         .fillMaxHeight(),
                     colorsType = themeState.colorsType,
+                    onSelect = {
+                        onThemeState(themeState.copy(colorsType = it))
+                    },
                 )
                 Spacer(modifier = Modifier.weight(1f)) // todo lang
             }
@@ -82,5 +86,6 @@ internal fun SettingsScreen(
     if (themeState == null) return
     SettingsScreen(
         themeState = themeState,
+        onThemeState = themeLogics::setThemeState,
     )
 }
