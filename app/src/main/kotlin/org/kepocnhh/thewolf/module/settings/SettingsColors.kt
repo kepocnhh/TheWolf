@@ -150,7 +150,6 @@ internal fun SettingsColors(
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
                 .background(App.Theme.colors.secondary, RoundedCornerShape(16.dp))
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {

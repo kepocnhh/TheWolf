@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,7 +31,8 @@ internal fun SettingsScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(App.Theme.colors.background),
+            .background(App.Theme.colors.background)
+            .padding(horizontal = 16.dp),
     ) {
         Column(
             modifier = Modifier.align(Alignment.Center),
@@ -40,6 +42,7 @@ internal fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(64.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 SettingsColors(
                     modifier = Modifier
@@ -50,13 +53,22 @@ internal fun SettingsScreen(
                         onThemeState(themeState.copy(colorsType = it))
                     },
                 )
-                Spacer(modifier = Modifier.weight(1f)) // todo lang
+                SettingsStrings(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    stringsType = themeState.stringsType,
+                    onSelect = {
+                        onThemeState(themeState.copy(stringsType = it))
+                    },
+                )
             }
             // todo
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(64.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 SettingsVersion(
                     modifier = Modifier

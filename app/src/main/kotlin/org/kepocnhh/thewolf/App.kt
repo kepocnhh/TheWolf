@@ -1,6 +1,7 @@
 package org.kepocnhh.thewolf
 
 import android.app.Application
+import android.content.res.Configuration
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,6 +11,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.DpOffset
@@ -21,6 +23,8 @@ import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.module.app.Colors
 import org.kepocnhh.thewolf.module.app.ColorsType
 import org.kepocnhh.thewolf.module.app.Injection
+import org.kepocnhh.thewolf.module.app.Strings
+import org.kepocnhh.thewolf.module.app.StringsType
 import org.kepocnhh.thewolf.module.app.ThemeState
 import org.kepocnhh.thewolf.provider.Contexts
 import org.kepocnhh.thewolf.provider.LocalDataProvider
@@ -47,18 +51,24 @@ import kotlin.time.Duration.Companion.seconds
 
 internal class App : Application() {
     object Theme {
-        private val LocalColors = staticCompositionLocalOf<Colors> { error("No colors!") }
         private val LocalInsets = staticCompositionLocalOf<PaddingValues> { error("No insets!") }
+        private val LocalColors = staticCompositionLocalOf<Colors> { error("No colors!") }
+        private val LocalStrings = staticCompositionLocalOf<Strings> { error("No strings!") }
+
+        val insets: PaddingValues
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalInsets.current
 
         val colors: Colors
             @Composable
             @ReadOnlyComposable
             get() = LocalColors.current
 
-        val insets: PaddingValues
+        val strings: Strings
             @Composable
             @ReadOnlyComposable
-            get() = LocalInsets.current
+            get() = LocalStrings.current
 
         @Composable
         fun getColors(colorsType: ColorsType): Colors {
@@ -70,19 +80,77 @@ internal class App : Application() {
         }
 
         @Composable
+        fun getStrings(stringsType: StringsType): Strings {
+            return getStrings(
+                configuration = LocalConfiguration.current,
+                map = getStrings(),
+                stringsType = stringsType,
+            )
+        }
+
+        private fun getStrings(): Map<String, Strings> {
+            return mapOf(
+                "ru" to Strings(
+                    auto = "Автоматически",
+                    language = "ru",
+                    languageName = "Русский",
+                    settingsLanguage = "Язык",
+                ),
+                "en" to Strings(
+                    auto = "Auto",
+                    language = "en",
+                    languageName = "English",
+                    settingsLanguage = "Language",
+                ),
+            ) // todo
+        }
+
+        private fun getDefaultStrings(map: Map<String, Strings>): Strings {
+            return map["en"] ?: error("No default strings!")
+        }
+
+        private fun getStrings(
+            configuration: Configuration,
+            map: Map<String, Strings>,
+            stringsType: StringsType,
+        ): Strings {
+            return when (stringsType) {
+                StringsType.Auto -> {
+                    configuration
+                        .locales
+                        .get(0)
+                        ?.language
+                        ?.let(map::get)
+                        ?: getDefaultStrings(map)
+                }
+                is StringsType.Locale -> {
+                    map[stringsType.language] ?: error("No strings by \"${stringsType.language}\"!")
+                }
+            }
+        }
+
+        @Composable
         fun Composition(
             contexts: Contexts,
             onBackPressedDispatcher: OnBackPressedDispatcher,
             themeState: ThemeState,
             content: @Composable () -> Unit,
         ) {
-            val colors = getColors(themeState.colorsType)
             val insets = LocalView.current.rootWindowInsets.toPaddings()
+            val colors = getColors(themeState.colorsType)
+            val map = getStrings()
+            _locales = map.keys
+            val strings = getStrings(
+                configuration = LocalConfiguration.current,
+                map = map,
+                stringsType = themeState.stringsType,
+            )
             CompositionLocalProvider(
                 LocalTextInputService provides null,
                 LocalOnBackPressedDispatcher provides onBackPressedDispatcher,
-                LocalColors provides colors,
                 LocalInsets provides insets,
+                LocalColors provides colors,
+                LocalStrings provides strings,
                 LocalSquaresStyle provides SquaresStyle(
                     color = colors.foreground,
                     squareSize = DpSize(width = 32.dp, height = 32.dp),
@@ -123,7 +191,7 @@ internal class App : Application() {
             locals = MockLocalDataProvider(
                 themeState = ThemeState(
                     colorsType = ColorsType.Auto,
-//                    colorsType = ColorsType.DARK, // todo
+                    stringsType = StringsType.Auto,
                 ),
 //                tasks = (1..30).map { index ->
 //                    Task(
@@ -158,9 +226,11 @@ internal class App : Application() {
         )
 
         val contexts: Contexts
-            get() {
-                return checkNotNull(_injection) { "No injection!" }.contexts
-            }
+            get() = checkNotNull(_injection) { "No injection!" }.contexts
+
+        private var _locales: Set<String>? = null
+        val locales: Set<String>
+            get() = checkNotNull(_locales) { "No locales!" }
 
         @Composable
         inline fun <reified T : Logics> logics(label: String = T::class.java.name): T {

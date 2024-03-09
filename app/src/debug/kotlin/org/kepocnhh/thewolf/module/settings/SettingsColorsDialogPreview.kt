@@ -6,6 +6,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import org.kepocnhh.thewolf.module.app.ColorsType
 import org.kepocnhh.thewolf.module.app.ColorsTypeProvider
 import org.kepocnhh.thewolf.module.app.PreviewComposition
+import org.kepocnhh.thewolf.module.app.StringsType
 import org.kepocnhh.thewolf.module.app.ThemeState
 
 @Composable
@@ -35,6 +36,7 @@ private fun SettingsColorsDialogThemeStatePreview(
 ) {
     val themeState = ThemeState(
         colorsType = colorsType,
+        stringsType = StringsType.Auto,
     )
     SettingsColorsDialogPreview(
         themeState = themeState,

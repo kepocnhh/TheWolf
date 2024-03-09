@@ -4,7 +4,7 @@ Another todo list application.
 ---
 
 ### backlog
-- [ ] strings as res
+- [?] strings as res
 - [?] colors as res
 - [?] keyboard lib (new line)
 - [ ] pinpad lib
