@@ -1,6 +1,7 @@
 package org.kepocnhh.thewolf
 
 import android.app.Application
+import android.content.Context
 import android.content.res.Configuration
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,6 +13,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.DpOffset
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
+import org.json.JSONObject
 import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.module.app.Colors
 import org.kepocnhh.thewolf.module.app.ColorsType
@@ -43,6 +46,7 @@ import sp.kx.logics.LogicsProvider
 import sp.kx.logics.contains
 import sp.kx.logics.get
 import sp.kx.logics.remove
+import java.io.InputStream
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -83,26 +87,33 @@ internal class App : Application() {
         fun getStrings(stringsType: StringsType): Strings {
             return getStrings(
                 configuration = LocalConfiguration.current,
-                map = getStrings(),
+                map = getStrings(LocalContext.current),
                 stringsType = stringsType,
             )
         }
 
-        private fun getStrings(): Map<String, Strings> {
-            return mapOf(
-                "ru" to Strings(
-                    auto = "Автоматически",
-                    language = "ru",
-                    languageName = "Русский",
-                    settingsLanguage = "Язык",
-                ),
-                "en" to Strings(
-                    auto = "Auto",
-                    language = "en",
-                    languageName = "English",
-                    settingsLanguage = "Language",
-                ),
-            ) // todo
+        private fun toStrings(json: String): Strings {
+            val root = JSONObject(json)
+            val data = root.getJSONObject("data")
+            val con = Strings::class.java.constructors.firstOrNull()
+            checkNotNull(con) { "No constructors!" }
+            val fields = Strings::class.java.declaredFields.filter { !java.lang.reflect.Modifier.isStatic(it.modifiers) }
+            val args = fields.map {
+                data.getString(it.name)
+            }.toTypedArray()
+            return con.newInstance(*args) as Strings
+        }
+
+        private fun getStrings(context: Context): Map<String, Strings> {
+            val locales = context.assets.list("")
+                ?.filter { it.matches("^strings_[a-z]{2}.json\$".toRegex()) }
+                ?.mapNotNull { name ->
+                    runCatching {
+                        context.assets.open(name).use { toStrings(it.reader().readText()) }
+                    }.getOrNull()
+                }
+            if (locales.isNullOrEmpty()) error("No locales!")
+            return locales.associateBy { it.language }
         }
 
         private fun getDefaultStrings(map: Map<String, Strings>): Strings {
@@ -138,7 +149,7 @@ internal class App : Application() {
         ) {
             val insets = LocalView.current.rootWindowInsets.toPaddings()
             val colors = getColors(themeState.colorsType)
-            val map = getStrings()
+            val map = getStrings(LocalContext.current)
             _locales = map.keys
             val strings = getStrings(
                 configuration = LocalConfiguration.current,
