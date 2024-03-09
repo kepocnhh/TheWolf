@@ -1,8 +1,6 @@
 package org.kepocnhh.thewolf
 
 import android.app.Application
-import android.content.Context
-import android.content.res.Configuration
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,7 +11,6 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.DpOffset
@@ -21,7 +18,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
-import org.json.JSONObject
 import org.kepocnhh.thewolf.entity.Task
 import org.kepocnhh.thewolf.module.app.Colors
 import org.kepocnhh.thewolf.module.app.ColorsType
@@ -35,7 +31,6 @@ import org.kepocnhh.thewolf.provider.LocalDataProvider
 import org.kepocnhh.thewolf.util.compose.LocalOnBackPressedDispatcher
 import org.kepocnhh.thewolf.util.compose.toPaddings
 import sp.ax.jc.animations.style.LocalTweenStyle
-import sp.ax.jc.animations.style.TweenStyle
 import sp.ax.jc.keyboard.KeyboardColors
 import sp.ax.jc.keyboard.KeyboardStyle
 import sp.ax.jc.keyboard.LocalKeyboardStyle
@@ -47,9 +42,7 @@ import sp.kx.logics.LogicsProvider
 import sp.kx.logics.contains
 import sp.kx.logics.get
 import sp.kx.logics.remove
-import java.io.InputStream
 import java.util.UUID
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -86,10 +79,23 @@ internal class App : Application() {
 
         @Composable
         fun getStrings(stringsType: StringsType): Strings {
-            return StringsUtil.getStrings(
+            return when (stringsType) {
+                StringsType.Auto -> StringsUtil.getStringsOrNull(
+                    configuration = LocalConfiguration.current,
+                    stringsMap = stringsMap,
+                )
+                is StringsType.Locale -> {
+                    stringsMap[stringsType.language]
+                }
+            } ?: stringsMap["en"] ?: error("No strings!")
+        }
+
+        @Composable
+        fun getLanguage(stringsType: StringsType): String {
+            return StringsUtil.getLanguage(
                 configuration = LocalConfiguration.current,
-                stringsMap = StringsUtil.getStringsMap(LocalContext.current),
                 stringsType = stringsType,
+                stringsMap = stringsMap,
                 defaultLanguage = "en",
             )
         }
@@ -103,14 +109,7 @@ internal class App : Application() {
         ) {
             val insets = LocalView.current.rootWindowInsets.toPaddings()
             val colors = getColors(themeState.colorsType)
-            val stringsMap = StringsUtil.getStringsMap(LocalContext.current)
-            _locales = stringsMap.keys
-            val strings = StringsUtil.getStrings(
-                configuration = LocalConfiguration.current,
-                stringsMap = stringsMap,
-                stringsType = themeState.stringsType,
-                defaultLanguage = "en",
-            )
+            val strings = getStrings(themeState.stringsType)
             CompositionLocalProvider(
                 LocalTextInputService provides null,
                 LocalOnBackPressedDispatcher provides onBackPressedDispatcher,
@@ -149,6 +148,7 @@ internal class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        _stringsMap = StringsUtil.getStringsMap(this)
         _injection = Injection(
             contexts = Contexts(
                 main = Dispatchers.Main,
@@ -194,9 +194,9 @@ internal class App : Application() {
         val contexts: Contexts
             get() = checkNotNull(_injection) { "No injection!" }.contexts
 
-        private var _locales: Set<String>? = null
-        val locales: Set<String>
-            get() = checkNotNull(_locales) { "No locales!" }
+        private var _stringsMap: Map<String, Strings>? = null
+        val stringsMap: Map<String, Strings>
+            get() = checkNotNull(_stringsMap) { "No strings!" }
 
         @Composable
         inline fun <reified T : Logics> logics(label: String = T::class.java.name): T {

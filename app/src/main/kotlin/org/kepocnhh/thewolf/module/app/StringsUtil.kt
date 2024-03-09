@@ -15,10 +15,6 @@ internal object StringsUtil {
         return con.newInstance(*args) as Strings
     }
 
-    private fun toStrings(json: String): Strings {
-        return toStrings(JSONObject(json).getJSONObject("data"))
-    }
-
     fun getStringsMap(context: Context): Map<String, Strings> {
         val files = context.assets.list("")
             ?.filter { it.matches("^strings_[a-z]{2}.json\$".toRegex()) }
@@ -26,7 +22,8 @@ internal object StringsUtil {
         val locales = files.mapNotNull { name ->
                 runCatching {
                     context.assets.open(name).use {
-                        toStrings(it.reader().readText())
+                        val json = it.reader().readText()
+                        toStrings(JSONObject(json).getJSONObject("data"))
                     }
                 }.getOrNull()
             }
@@ -34,7 +31,7 @@ internal object StringsUtil {
         return locales.associateBy { it.language }
     }
 
-    private fun getStrings(
+    fun getStringsOrNull(
         configuration: Configuration,
         stringsMap: Map<String, Strings>,
     ): Strings? {
@@ -46,24 +43,25 @@ internal object StringsUtil {
         return stringsMap[language]
     }
 
-    private fun Map<String, Strings>.requireStrings(language: String): Strings {
-        return get(language) ?: error("No strings by \"$language\"!")
-    }
-
-    fun getStrings(
+    fun getLanguage(
         configuration: Configuration,
         stringsMap: Map<String, Strings>,
         stringsType: StringsType,
         defaultLanguage: String,
-    ): Strings {
+    ): String {
         return when (stringsType) {
             StringsType.Auto -> {
-                getStrings(configuration, stringsMap)
-                    ?: stringsMap.requireStrings(defaultLanguage)
+                val language = configuration
+                    .locales
+                    .get(0)
+                    ?.language
+                if (language == null || !stringsMap.keys.contains(language)) {
+                    defaultLanguage
+                } else {
+                    language
+                }
             }
-            is StringsType.Locale -> {
-                stringsMap.requireStrings(stringsType.language)
-            }
+            is StringsType.Locale -> stringsType.language
         }
     }
 }

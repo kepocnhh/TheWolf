@@ -22,6 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -31,15 +33,24 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import org.kepocnhh.thewolf.App
 import org.kepocnhh.thewolf.R
+import org.kepocnhh.thewolf.module.app.Strings
 import org.kepocnhh.thewolf.module.app.StringsType
 
 @Composable
-private fun getText(stringsType: StringsType): String {
-    val strings = App.Theme.getStrings(stringsType)
+private fun getText(stringsType: StringsType, strings: Strings): String {
     return when (stringsType) {
         StringsType.Auto -> strings.auto
         is StringsType.Locale -> strings.languageName
     }
+}
+
+@Composable
+private fun getPainterOrNull(stringsType: StringsType): Painter? {
+    val language = App.Theme.getLanguage(stringsType)
+    val context = LocalContext.current
+    val id = context.resources.getIdentifier("strings_$language", "drawable", context.packageName)
+    if (id == 0) return null
+    return painterResource(id = id)
 }
 
 @Composable
@@ -49,6 +60,7 @@ private fun SettingsStringsRow(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
+    val strings = App.Theme.getStrings(stringsType)
     Box(modifier = modifier) {
         Box(
             modifier = Modifier
@@ -57,7 +69,16 @@ private fun SettingsStringsRow(
                 .clickable(onClick = onClick)
                 .padding(horizontal = 16.dp),
         ) {
-            // todo icon
+            val painter = getPainterOrNull(stringsType)
+            if (painter != null) {
+                Image(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .align(Alignment.CenterStart),
+                    painter = painter,
+                    contentDescription = "strings:row:icon",
+                )
+            }
             BasicText(
                 modifier = Modifier.align(Alignment.Center),
                 style = TextStyle(
@@ -66,7 +87,7 @@ private fun SettingsStringsRow(
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Monospace,
                 ),
-                text = getText(stringsType),
+                text = getText(stringsType, strings),
             )
             if (isSelected) {
                 Image(
@@ -121,6 +142,7 @@ internal fun SettingsStrings(
     onSelect: (StringsType) -> Unit,
 ) {
     val dialogState = remember { mutableStateOf(false) }
+    val strings = App.Theme.strings
     Box(modifier = modifier) {
         Row(
             modifier = Modifier
@@ -145,7 +167,7 @@ internal fun SettingsStrings(
                         fontSize = 13.sp,
                         color = App.Theme.colors.text,
                     ),
-                    text = App.Theme.strings.settingsLanguage,
+                    text = strings.settingsLanguage,
                 )
                 BasicText(
                     modifier = Modifier.align(Alignment.BottomStart),
@@ -155,29 +177,31 @@ internal fun SettingsStrings(
                         fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.Monospace,
                     ),
-                    text = getText(stringsType),
+                    text = getText(stringsType, strings),
                 )
             }
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxHeight(),
-//            ) {
-//                Image(
-//                    modifier = Modifier
-//                        .padding(start = 16.dp)
-//                        .size(24.dp)
-//                        .align(Alignment.Center),
-//                    painter = painterResource(id = getIcon(colorsType)),
-//                    contentDescription = "colors:icon",
-//                    colorFilter = ColorFilter.tint(App.Theme.colors.foreground),
-//                )
-//            }
+            val painter = getPainterOrNull(stringsType)
+            if (painter != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight(),
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .size(24.dp)
+                            .align(Alignment.Center),
+                        painter = painter,
+                        contentDescription = "strings:icon",
+                    )
+                }
+            }
         }
         if (dialogState.value) {
             SettingsStringsDialog(
                 selected = stringsType,
                 onSelect = onSelect,
-                list = App.locales.map(StringsType::Locale) + StringsType.Auto,
+                list = App.stringsMap.keys.map(StringsType::Locale) + StringsType.Auto,
                 onDismiss = {
                     dialogState.value = false
                 },

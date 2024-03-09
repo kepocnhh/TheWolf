@@ -16,8 +16,15 @@ internal fun PreviewComposition(
     contexts: Contexts = Contexts(main = Dispatchers.Main, default = Dispatchers.Default),
     onBackPressedDispatcher: OnBackPressedDispatcher = OnBackPressedDispatcher(),
     themeState: ThemeState,
+    stringsMap: Map<String, Strings> = listOf(
+        PreviewStrings.En,
+        PreviewStrings.Ru,
+    ).associateBy { it.language },
     content: @Composable BoxScope.() -> Unit,
 ) {
+    val field = App::class.java.getDeclaredField("_stringsMap")
+    field.isAccessible = true
+    field.set(App.Companion, stringsMap)
     App.Theme.Composition(
         contexts = contexts,
         onBackPressedDispatcher = onBackPressedDispatcher,
