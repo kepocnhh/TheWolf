@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -181,6 +182,8 @@ internal fun SettingsColors(
                         fontFamily = FontFamily.Monospace,
                     ),
                     text = getText(colorsType),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             Box(
@@ -189,7 +192,7 @@ internal fun SettingsColors(
             ) {
                 Image(
                     modifier = Modifier
-                        .padding(start = 16.dp)
+                        .padding(start = 8.dp)
                         .size(24.dp)
                         .align(Alignment.Center),
                     painter = painterResource(id = getIcon(colorsType)),
