@@ -25,9 +25,7 @@ private fun SettingsScreenPreview(
     ) {
         Box(modifier = Modifier.background(App.Theme.colors.background)) {
             SettingsScreen(
-                onBack = {
-                    // noop
-                },
+                themeState = themeState,
             )
         }
     }
