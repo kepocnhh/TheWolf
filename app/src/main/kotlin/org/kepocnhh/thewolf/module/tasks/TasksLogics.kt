@@ -41,4 +41,14 @@ internal class TasksLogics(
         }
         _state.emit(State(tasks = tasks))
     }
+
+    fun deleteTask(id: UUID) = launch {
+        val tasks = withContext(injection.contexts.default) {
+            val tasks = injection.locals.tasks.toMutableList()
+            tasks.removeIf { it.id == id }
+            injection.locals.tasks = tasks
+            tasks
+        }
+        _state.emit(State(tasks = tasks))
+    }
 }

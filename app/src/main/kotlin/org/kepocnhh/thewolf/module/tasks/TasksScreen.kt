@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -62,7 +64,10 @@ import sp.ax.jc.squares.Squares
 import java.util.Calendar
 
 @Composable
-private fun TaskItem(item: Task) {
+private fun TaskItem(
+    item: Task,
+    onDelete: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .padding(horizontal = 16.dp)
@@ -73,17 +78,19 @@ private fun TaskItem(item: Task) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp),
+                .padding(start = 32.dp, end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             val calendar = remember { Calendar.getInstance() }
             calendar.timeInMillis = item.created.inWholeMilliseconds
             val dateText = "${calendar[Calendar.YEAR]}.${calendar[Calendar.MONTH] + 1}.${calendar[Calendar.DAY_OF_MONTH]}"
             val timeText = "${calendar[Calendar.HOUR]}:${calendar[Calendar.MINUTE]}:${calendar[Calendar.SECOND]}"
+//            val text = item.title + " $dateText/$timeText" // todo date/time
             BasicText(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
                     .wrapContentHeight(),
-                text = item.title + " $dateText/$timeText", // todo date/time
+                text = item.title,
                 style = TextStyle(
                     color = App.Theme.colors.text,
                     textAlign = TextAlign.Start,
@@ -93,6 +100,21 @@ private fun TaskItem(item: Task) {
                 minLines = 1,
                 maxLines = 1,
             )
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable(onClick = onDelete),
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .align(Alignment.Center),
+                    painter = painterResource(id = R.drawable.cross),
+                    contentDescription = "task:delete:icon",
+                    colorFilter = ColorFilter.tint(App.Theme.colors.icon),
+                )
+            }
         }
     }
 }
@@ -103,6 +125,7 @@ private fun TasksScreen(
     onNewTask: () -> Unit,
     onSettings: () -> Unit,
 ) {
+    val logics = App.logics<TasksLogics>()
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -125,7 +148,12 @@ private fun TasksScreen(
                 items = state.tasks,
                 key = Task::id,
             ) { task ->
-                TaskItem(item = task)
+                TaskItem(
+                    item = task,
+                    onDelete = {
+                        logics.deleteTask(task.id)
+                    },
+                )
             }
         }
         Row(
@@ -243,6 +271,18 @@ internal fun TasksScreen() {
                     menuState.value = TasksScreen.Menu.SETTINGS
                 },
             )
+            FadeVisibility(
+                modifier = Modifier
+                    .align(Alignment.Center),
+                visible = state.tasks.isEmpty(),
+            ) {
+                BasicText(
+                    text = "no tasks",
+                    style = TextStyle(
+                        color = App.Theme.colors.text,
+                    ),
+                )
+            }
             FadeVisibility(
                 visible = menuState.value != null,
             ) {
