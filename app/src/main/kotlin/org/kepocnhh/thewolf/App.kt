@@ -27,6 +27,7 @@ import org.kepocnhh.thewolf.module.app.StringsType
 import org.kepocnhh.thewolf.module.app.StringsUtil
 import org.kepocnhh.thewolf.module.app.ThemeState
 import org.kepocnhh.thewolf.provider.Contexts
+import org.kepocnhh.thewolf.provider.FinalLocalDataProvider
 import org.kepocnhh.thewolf.provider.LocalDataProvider
 import org.kepocnhh.thewolf.util.compose.LocalOnBackPressedDispatcher
 import org.kepocnhh.thewolf.util.compose.toPaddings
@@ -140,12 +141,6 @@ internal class App : Application() {
         }
     }
 
-    // todo
-    private class MockLocalDataProvider(
-        override var themeState: ThemeState,
-        override var tasks: List<Task>,
-    ) : LocalDataProvider
-
     override fun onCreate() {
         super.onCreate()
         _stringsMap = StringsUtil.getStringsMap(this)
@@ -154,26 +149,12 @@ internal class App : Application() {
                 main = Dispatchers.Main,
                 default = Dispatchers.Default,
             ),
-            locals = MockLocalDataProvider(
+            locals = FinalLocalDataProvider(
+                context = this,
                 themeState = ThemeState(
                     colorsType = ColorsType.Auto,
                     stringsType = StringsType.Auto,
                 ),
-//                tasks = (1..30).map { index ->
-//                    Task(
-//                        id = UUID.randomUUID(),
-//                        title = "task #$index",
-//                        isChecked = true,
-//                        date = System.currentTimeMillis().milliseconds - 48.hours + (index * 6).hours,
-//                    )
-//                },
-                tasks = (1..4).map { number ->
-                    Task(
-                        id = UUID.randomUUID(),
-                        title = "task #$number",
-                        created = System.currentTimeMillis().milliseconds + number.hours,
-                    )
-                },
             )
         )
     }
