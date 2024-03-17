@@ -27,7 +27,7 @@ private fun NewTaskScreenPreview(
             onBack = {
                 // noop
             },
-            onNewTask = {
+            onNewTask = { _, _ ->
                 // noop
             },
             initialFocused = isFocused,

@@ -90,6 +90,7 @@ internal class FinalLocalDataProvider(
                 .put("id", id.toString())
                 .put("title", title)
                 .put("created", created.inWholeMilliseconds)
+                .put("repeated", repeated.joinToString(separator = ""))
         }
 
         private fun JSONObject.toTask(): Task {
@@ -97,6 +98,7 @@ internal class FinalLocalDataProvider(
                 id = UUID.fromString(getString("id")),
                 title = getString("title"),
                 created = getLong("created").milliseconds,
+                repeated = optString("repeated").map { "$it".toInt() }.toSet(),
             )
         }
     }

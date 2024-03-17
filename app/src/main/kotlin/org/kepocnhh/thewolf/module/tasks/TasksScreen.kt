@@ -297,8 +297,8 @@ internal fun TasksScreen() {
                     onBack = {
                         menuState.value = null
                     },
-                    onNewTask = { title: String ->
-                        logics.addTask(title = title)
+                    onNewTask = { title: String, repeated: Set<Int>? ->
+                        logics.addTask(title = title, repeated = repeated)
                         menuState.value = null
                     },
                 )

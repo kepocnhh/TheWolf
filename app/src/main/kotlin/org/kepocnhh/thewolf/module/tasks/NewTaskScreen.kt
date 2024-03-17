@@ -107,7 +107,7 @@ private fun TextField(
 @Composable
 internal fun NewTaskScreen(
     onBack: () -> Unit,
-    onNewTask: (title: String) -> Unit,
+    onNewTask: (title: String, repeated: Set<Int>?) -> Unit,
     initialFocused: Boolean,
     initialTitle: String,
     initialRepeated: Set<Int>?,
@@ -121,7 +121,7 @@ internal fun NewTaskScreen(
         val focusRequester = remember { FocusRequester() }
         val isFocusedState = remember { mutableStateOf(initialFocused) }
         val titleState = remember { mutableStateOf(TextFieldValue(initialTitle)) }
-        val isRepeatedState = remember { mutableStateOf(initialRepeated) }
+        val repeatedState = remember { mutableStateOf(initialRepeated) }
         BackHandler {
             if (isFocusedState.value) {
                 focusRequester.freeFocus()
@@ -193,10 +193,10 @@ internal fun NewTaskScreen(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
                         .clickable {
-                            if (isRepeatedState.value == null) {
-                                isRepeatedState.value = emptySet()
+                            if (repeatedState.value == null) {
+                                repeatedState.value = emptySet()
                             } else {
-                                isRepeatedState.value = null
+                                repeatedState.value = null
                             }
                         }
                         .padding(
@@ -204,7 +204,7 @@ internal fun NewTaskScreen(
                             vertical = 8.dp,
                         )
                         .wrapContentHeight(),
-                    text = if (isRepeatedState.value == null) "no" else "yes", // todo
+                    text = if (repeatedState.value == null) "no" else "yes", // todo
                     style = TextStyle(
                         color = App.Theme.colors.primary,
                         fontSize = 15.sp,
@@ -214,7 +214,7 @@ internal fun NewTaskScreen(
             FadeVisibility(
                 modifier = Modifier
                     .fillMaxWidth(),
-                visible = isRepeatedState.value != null,
+                visible = repeatedState.value != null,
             ) {
                 Row(
                     modifier = Modifier
@@ -245,17 +245,17 @@ internal fun NewTaskScreen(
                             Calendar.SUNDAY -> "su"
                             else -> TODO()
                         } // todo
-                        val repeated = isRepeatedState.value.orEmpty()
+                        val repeated = repeatedState.value.orEmpty()
                         val contains = repeated.contains(dayOfWeek)
                         val color = if (contains) App.Theme.colors.primary else App.Theme.colors.secondary
                         BasicText(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(16.dp))
-                                .clickable(enabled = isRepeatedState.value != null) {
+                                .clickable(enabled = repeatedState.value != null) {
                                     if (contains) {
-                                        isRepeatedState.value = repeated - dayOfWeek
+                                        repeatedState.value = repeated - dayOfWeek
                                     } else {
-                                        isRepeatedState.value = repeated + dayOfWeek
+                                        repeatedState.value = repeated + dayOfWeek
                                     }
                                 }
                                 .padding(
@@ -288,7 +288,7 @@ internal fun NewTaskScreen(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
                         .clickable(enabled = isReady) {
-                            onNewTask(titleState.value.text)
+                            onNewTask(titleState.value.text, repeatedState.value)
                         }
                         .padding(
                             horizontal = 16.dp,
@@ -332,7 +332,7 @@ internal fun NewTaskScreen(
 @Composable
 internal fun NewTaskScreen(
     onBack: () -> Unit,
-    onNewTask: (title: String) -> Unit,
+    onNewTask: (title: String, repeated: Set<Int>?) -> Unit,
 ) {
     NewTaskScreen(
         onBack = onBack,

@@ -27,12 +27,13 @@ internal class TasksLogics(
         _state.emit(State(tasks = tasks))
     }
 
-    fun addTask(title: String) = launch {
+    fun addTask(title: String, repeated: Set<Int>?) = launch {
         val tasks = withContext(injection.contexts.default) {
             val task = Task(
                 id = UUID.randomUUID(),
                 title = title,
                 created = System.currentTimeMillis().milliseconds,
+                repeated = repeated.orEmpty(),
             )
             (injection.locals.tasks + task).sortedBy { it.created }
         }
