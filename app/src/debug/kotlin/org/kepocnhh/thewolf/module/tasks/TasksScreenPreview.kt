@@ -9,6 +9,7 @@ import org.kepocnhh.thewolf.module.app.ColorsTypeProvider
 import org.kepocnhh.thewolf.module.app.PreviewComposition
 import org.kepocnhh.thewolf.module.app.StringsType
 import org.kepocnhh.thewolf.module.app.ThemeState
+import java.util.Calendar
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
@@ -71,7 +72,11 @@ private fun TasksScreenTasksPreview(
                 id = UUID.randomUUID(),
                 title = "bar",
                 created = 2.seconds,
-                repeated = emptySet(),
+                repeated = setOf(
+                    Calendar.MONDAY,
+                    Calendar.THURSDAY,
+                    Calendar.FRIDAY,
+                ),
             ),
         ),
     )

@@ -267,7 +267,7 @@ internal fun NewTaskScreen(
                             style = TextStyle(
                                 color = color,
                                 fontSize = 15.sp,
-                                fontFamily = FontFamily.Monospace
+                                fontFamily = FontFamily.Monospace,
                             ),
                         )
                     }

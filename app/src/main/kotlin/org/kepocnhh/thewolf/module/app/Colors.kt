@@ -13,6 +13,7 @@ internal class Colors private constructor(
 ) {
     companion object {
         val White = Color(0xffffffff)
+        val Black = Color(0xff000000)
 
         val Dark = Colors(
             basement = Color(0xff0f0f0f),
@@ -28,9 +29,9 @@ internal class Colors private constructor(
             background = Color(0xffefefef),
             secondary = Color(0xffdfdfdf),
             foreground = Color(0xff1f1f1f),
-            text = Color(0xff000000),
+            text = Black,
             primary = Color(0xff1E88E5),
-            icon = Color(0xff000000),
+            icon = Black,
         )
     }
 }

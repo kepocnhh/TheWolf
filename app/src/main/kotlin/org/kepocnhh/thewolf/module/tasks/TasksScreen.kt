@@ -14,6 +14,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -46,6 +48,8 @@ import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -72,34 +76,76 @@ private fun TaskItem(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .background(App.Theme.colors.secondary, RoundedCornerShape(32.dp))
-            .fillMaxWidth()
-            .height(64.dp),
+            .fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
+                .heightIn(min = 64.dp)
+                .fillMaxWidth()
                 .padding(start = 32.dp, end = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val calendar = remember { Calendar.getInstance() }
-            calendar.timeInMillis = item.created.inWholeMilliseconds
-            val dateText = "${calendar[Calendar.YEAR]}.${calendar[Calendar.MONTH] + 1}.${calendar[Calendar.DAY_OF_MONTH]}"
-            val timeText = "${calendar[Calendar.HOUR]}:${calendar[Calendar.MINUTE]}:${calendar[Calendar.SECOND]}"
-//            val text = item.title + " $dateText/$timeText" // todo date/time
-            BasicText(
+            Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .wrapContentHeight(),
-                text = item.title,
-                style = TextStyle(
-                    color = App.Theme.colors.text,
-                    textAlign = TextAlign.Start,
-                    fontSize = 17.sp,
-                ),
-                overflow = TextOverflow.Ellipsis,
-                minLines = 1,
-                maxLines = 1,
-            )
+                    .weight(1f),
+            ) {
+                BasicText(
+                    text = item.title,
+                    style = TextStyle(
+                        color = App.Theme.colors.text,
+                        textAlign = TextAlign.Start,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                    overflow = TextOverflow.Ellipsis,
+                    minLines = 1,
+                    maxLines = 1,
+                )
+                if (item.repeated.isNotEmpty()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val days = setOf(
+                            Calendar.MONDAY,
+                            Calendar.TUESDAY,
+                            Calendar.WEDNESDAY,
+                            Calendar.THURSDAY,
+                            Calendar.FRIDAY,
+                            Calendar.SATURDAY,
+                            Calendar.SUNDAY,
+                        )
+                        days.forEach { dayOfWeek ->
+                            val text = when (dayOfWeek) {
+                                Calendar.MONDAY -> "mo"
+                                Calendar.TUESDAY -> "tu"
+                                Calendar.WEDNESDAY -> "we"
+                                Calendar.THURSDAY -> "th"
+                                Calendar.FRIDAY -> "fr"
+                                Calendar.SATURDAY -> "sa"
+                                Calendar.SUNDAY -> "su"
+                                else -> TODO()
+                            } // todo
+                            val contains = item.repeated.contains(dayOfWeek)
+                            val today = Calendar.getInstance()[Calendar.DAY_OF_WEEK] == dayOfWeek
+                            val color = when {
+                                today -> App.Theme.colors.primary
+                                contains -> App.Theme.colors.foreground
+                                else -> App.Theme.colors.background
+                            }
+                            BasicText(
+                                modifier = Modifier
+                                    .wrapContentHeight(),
+                                text = text,
+                                style = TextStyle(
+                                    color = color,
+                                    fontSize = 15.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                ),
+                            )
+                        }
+                    }
+                }
+            }
             Box(
                 modifier = Modifier
                     .size(32.dp)
