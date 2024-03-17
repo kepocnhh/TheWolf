@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -129,6 +130,9 @@ private fun isReady(title: String): Boolean {
 internal fun NewTaskScreen(
     onBack: () -> Unit,
     onNewTask: (title: String) -> Unit,
+    onFocusChanged: (FocusState) -> Unit,
+    titleState: MutableState<TextFieldValue>,
+    isFocused: Boolean,
 ) {
     Box(
         modifier = Modifier
@@ -136,11 +140,9 @@ internal fun NewTaskScreen(
             .background(App.Theme.colors.background),
     ) {
         val insets = App.Theme.insets
-        val titleState = remember { mutableStateOf(TextFieldValue()) }
-        val isFocusedState = remember { mutableStateOf(false) }
         val focusRequester = remember { FocusRequester() }
         BackHandler {
-            if (isFocusedState.value) {
+            if (isFocused) {
                 focusRequester.freeFocus()
             } else {
                 onBack()
@@ -150,7 +152,7 @@ internal fun NewTaskScreen(
             withContext(App.contexts.default) {
                 delay(0.5.seconds)
             }
-            if (!isFocusedState.value) {
+            if (!isFocused) {
                 focusRequester.requestFocus()
             }
         }
@@ -182,9 +184,7 @@ internal fun NewTaskScreen(
                 onValueChange = {
                     titleState.value = it
                 },
-                onFocusChanged = {
-                    isFocusedState.value = it.isFocused
-                },
+                onFocusChanged = onFocusChanged,
                 focusRequester = focusRequester,
             )
             Spacer(modifier = Modifier.weight(1f))
@@ -218,7 +218,7 @@ internal fun NewTaskScreen(
             }
             val bottomPx = insets.calculateBottomPadding().toPx().toInt()
             SlideVVisibility(
-                visible = isFocusedState.value,
+                visible = isFocused,
                 initialOffsetY = { it + bottomPx },
                 targetOffsetY = { it + bottomPx },
             ) {
@@ -241,4 +241,22 @@ internal fun NewTaskScreen(
             }
         }
     }
+}
+
+@Composable
+internal fun NewTaskScreen(
+    onBack: () -> Unit,
+    onNewTask: (title: String) -> Unit,
+) {
+    val isFocusedState = remember { mutableStateOf(false) }
+    val titleState = remember { mutableStateOf(TextFieldValue()) }
+    NewTaskScreen(
+        onBack = onBack,
+        onNewTask = onNewTask,
+        isFocused = isFocusedState.value,
+        onFocusChanged = {
+            isFocusedState.value = it.isFocused
+        },
+        titleState = titleState,
+    )
 }
