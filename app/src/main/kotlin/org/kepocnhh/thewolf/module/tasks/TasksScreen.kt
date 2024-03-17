@@ -120,12 +120,12 @@ private fun TaskItem(
 }
 
 @Composable
-private fun TasksScreen(
-    state: TasksLogics.State,
+internal fun TasksScreen(
+    tasks: List<Task>,
     onNewTask: () -> Unit,
     onSettings: () -> Unit,
+    onDelete: (Task) -> Unit,
 ) {
-    val logics = App.logics<TasksLogics>()
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -145,16 +145,28 @@ private fun TasksScreen(
             verticalArrangement = Arrangement.spacedBy(itemsPadding, itemsAlign),
         ) {
             items(
-                items = state.tasks,
+                items = tasks,
                 key = Task::id,
             ) { task ->
                 TaskItem(
                     item = task,
                     onDelete = {
-                        logics.deleteTask(task.id)
+                        onDelete(task)
                     },
                 )
             }
+        }
+        FadeVisibility(
+            modifier = Modifier
+                .align(Alignment.Center),
+            visible = tasks.isEmpty(),
+        ) {
+            BasicText(
+                text = "no tasks",
+                style = TextStyle(
+                    color = App.Theme.colors.text,
+                ),
+            )
         }
         Row(
             modifier = Modifier
@@ -263,26 +275,17 @@ internal fun TasksScreen() {
         val menuState = remember { mutableStateOf<TasksScreen.Menu?>(null) }
         if (state != null) {
             TasksScreen(
-                state = state,
+                tasks = state.tasks,
                 onNewTask = {
                     menuState.value = TasksScreen.Menu.NEW_TASK
                 },
                 onSettings = {
                     menuState.value = TasksScreen.Menu.SETTINGS
                 },
+                onDelete = {
+                    logics.deleteTask(it.id)
+                },
             )
-            FadeVisibility(
-                modifier = Modifier
-                    .align(Alignment.Center),
-                visible = state.tasks.isEmpty(),
-            ) {
-                BasicText(
-                    text = "no tasks",
-                    style = TextStyle(
-                        color = App.Theme.colors.text,
-                    ),
-                )
-            }
             FadeVisibility(
                 visible = menuState.value != null,
             ) {
