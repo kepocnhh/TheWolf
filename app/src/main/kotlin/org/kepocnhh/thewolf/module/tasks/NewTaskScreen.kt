@@ -3,13 +3,16 @@ package org.kepocnhh.thewolf.module.tasks
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
@@ -19,18 +22,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.kepocnhh.thewolf.App
@@ -39,8 +44,10 @@ import org.kepocnhh.thewolf.util.compose.backspace
 import org.kepocnhh.thewolf.util.compose.clear
 import org.kepocnhh.thewolf.util.compose.plus
 import org.kepocnhh.thewolf.util.compose.toPx
+import sp.ax.jc.animations.tween.fade.FadeVisibility
 import sp.ax.jc.animations.tween.slide.vertical.SlideVVisibility
 import sp.ax.jc.keyboard.Keyboard
+import java.util.Calendar
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
@@ -98,41 +105,12 @@ private fun TextField(
 }
 
 @Composable
-private fun TextField(text: String) {
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .background(App.Theme.colors.basement, RoundedCornerShape(32.dp))
-            .fillMaxWidth(),
-    ) {
-        BasicText(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 32.dp,
-                    vertical = 16.dp,
-                ),
-            text = text,
-            style = TextStyle(
-                color = App.Theme.colors.text,
-                textAlign = TextAlign.Start,
-                fontSize = 17.sp,
-            ),
-        )
-    }
-}
-
-private fun isReady(title: String): Boolean {
-    return title.isNotBlank()
-}
-
-@Composable
 internal fun NewTaskScreen(
     onBack: () -> Unit,
     onNewTask: (title: String) -> Unit,
-    onFocusChanged: (FocusState) -> Unit,
-    titleState: MutableState<TextFieldValue>,
-    isFocused: Boolean,
+    initialFocused: Boolean,
+    initialTitle: String,
+    initialRepeated: Set<Int>?,
 ) {
     Box(
         modifier = Modifier
@@ -141,8 +119,11 @@ internal fun NewTaskScreen(
     ) {
         val insets = App.Theme.insets
         val focusRequester = remember { FocusRequester() }
+        val isFocusedState = remember { mutableStateOf(initialFocused) }
+        val titleState = remember { mutableStateOf(TextFieldValue(initialTitle)) }
+        val isRepeatedState = remember { mutableStateOf(initialRepeated) }
         BackHandler {
-            if (isFocused) {
+            if (isFocusedState.value) {
                 focusRequester.freeFocus()
             } else {
                 onBack()
@@ -152,7 +133,7 @@ internal fun NewTaskScreen(
             withContext(App.contexts.default) {
                 delay(0.5.seconds)
             }
-            if (!isFocused) {
+            if (!isFocusedState.value) {
                 focusRequester.requestFocus()
             }
         }
@@ -184,9 +165,114 @@ internal fun NewTaskScreen(
                 onValueChange = {
                     titleState.value = it
                 },
-                onFocusChanged = onFocusChanged,
+                onFocusChanged = {
+                    isFocusedState.value = it.isFocused
+                },
                 focusRequester = focusRequester,
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 16.dp,
+                        vertical = 8.dp,
+                    ),
+            ) {
+                Spacer(modifier = Modifier.width(24.dp))
+                BasicText(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    text = "Repeated", // todo
+                    style = TextStyle(
+                        color = App.Theme.colors.text,
+                        fontSize = 15.sp,
+                    ),
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                BasicText(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable {
+                            if (isRepeatedState.value == null) {
+                                isRepeatedState.value = emptySet()
+                            } else {
+                                isRepeatedState.value = null
+                            }
+                        }
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 8.dp,
+                        )
+                        .wrapContentHeight(),
+                    text = if (isRepeatedState.value == null) "no" else "yes", // todo
+                    style = TextStyle(
+                        color = App.Theme.colors.primary,
+                        fontSize = 15.sp,
+                    ),
+                )
+            }
+            FadeVisibility(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                visible = isRepeatedState.value != null,
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 8.dp,
+                        ),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                ) {
+                    val days = setOf(
+                        Calendar.MONDAY,
+                        Calendar.TUESDAY,
+                        Calendar.WEDNESDAY,
+                        Calendar.THURSDAY,
+                        Calendar.FRIDAY,
+                        Calendar.SATURDAY,
+                        Calendar.SUNDAY,
+                    )
+                    days.forEach { dayOfWeek ->
+                        val text = when (dayOfWeek) {
+                            Calendar.MONDAY -> "mo"
+                            Calendar.TUESDAY -> "tu"
+                            Calendar.WEDNESDAY -> "we"
+                            Calendar.THURSDAY -> "th"
+                            Calendar.FRIDAY -> "fr"
+                            Calendar.SATURDAY -> "sa"
+                            Calendar.SUNDAY -> "su"
+                            else -> TODO()
+                        } // todo
+                        val repeated = isRepeatedState.value.orEmpty()
+                        val contains = repeated.contains(dayOfWeek)
+                        val color = if (contains) App.Theme.colors.primary else App.Theme.colors.secondary
+                        BasicText(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable(enabled = isRepeatedState.value != null) {
+                                    if (contains) {
+                                        isRepeatedState.value = repeated - dayOfWeek
+                                    } else {
+                                        isRepeatedState.value = repeated + dayOfWeek
+                                    }
+                                }
+                                .padding(
+                                    horizontal = 8.dp,
+                                    vertical = 8.dp,
+                                )
+                                .wrapContentHeight(),
+                            text = text,
+                            style = TextStyle(
+                                color = color,
+                                fontSize = 15.sp,
+                                fontFamily = FontFamily.Monospace
+                            ),
+                        )
+                    }
+                }
+            }
             Spacer(modifier = Modifier.weight(1f))
             Row(
                 modifier = Modifier
@@ -197,7 +283,7 @@ internal fun NewTaskScreen(
                     ),
             ) {
                 Spacer(modifier = Modifier.weight(1f))
-                val isReady = isReady(title = titleState.value.text)
+                val isReady = titleState.value.text.isNotBlank()
                 BasicText(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
@@ -218,7 +304,7 @@ internal fun NewTaskScreen(
             }
             val bottomPx = insets.calculateBottomPadding().toPx().toInt()
             SlideVVisibility(
-                visible = isFocused,
+                visible = isFocusedState.value,
                 initialOffsetY = { it + bottomPx },
                 targetOffsetY = { it + bottomPx },
             ) {
@@ -248,15 +334,11 @@ internal fun NewTaskScreen(
     onBack: () -> Unit,
     onNewTask: (title: String) -> Unit,
 ) {
-    val isFocusedState = remember { mutableStateOf(false) }
-    val titleState = remember { mutableStateOf(TextFieldValue()) }
     NewTaskScreen(
         onBack = onBack,
         onNewTask = onNewTask,
-        isFocused = isFocusedState.value,
-        onFocusChanged = {
-            isFocusedState.value = it.isFocused
-        },
-        titleState = titleState,
+        initialFocused = false,
+        initialTitle = "",
+        initialRepeated = null,
     )
 }

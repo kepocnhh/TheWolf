@@ -11,17 +11,18 @@ import org.kepocnhh.thewolf.module.app.ColorsTypeProvider
 import org.kepocnhh.thewolf.module.app.PreviewComposition
 import org.kepocnhh.thewolf.module.app.StringsType
 import org.kepocnhh.thewolf.module.app.ThemeState
+import java.util.Calendar
 
 @Composable
 private fun NewTaskScreenPreview(
     themeState: ThemeState,
-    isFocused: Boolean,
-    title: String,
+    isFocused: Boolean = false,
+    title: String = "",
+    repeated: Set<Int>? = null,
 ) {
     PreviewComposition(
         themeState = themeState,
     ) {
-        val titleState = remember { mutableStateOf(TextFieldValue(title)) }
         NewTaskScreen(
             onBack = {
                 // noop
@@ -29,11 +30,9 @@ private fun NewTaskScreenPreview(
             onNewTask = {
                 // noop
             },
-            onFocusChanged = {
-                // noop
-            },
-            isFocused = isFocused,
-            titleState = titleState,
+            initialFocused = isFocused,
+            initialTitle = title,
+            initialRepeated = repeated,
         )
     }
 }
@@ -49,8 +48,6 @@ private fun NewTaskScreenColorsTypePreview(
     )
     NewTaskScreenPreview(
         themeState = themeState,
-        isFocused = false,
-        title = "",
     )
 }
 
@@ -66,7 +63,6 @@ private fun NewTaskScreenFocusedPreview(
     NewTaskScreenPreview(
         themeState = themeState,
         isFocused = true,
-        title = "",
     )
 }
 
@@ -81,7 +77,25 @@ private fun NewTaskScreenTitlePreview(
     )
     NewTaskScreenPreview(
         themeState = themeState,
-        isFocused = true,
         title = "foobar",
+    )
+}
+
+@Preview(name = "Repeated")
+@Composable
+private fun NewTaskScreenRepeatedPreview(
+    @PreviewParameter(ColorsTypeProvider::class) colorsType: ColorsType,
+) {
+    val themeState = ThemeState(
+        colorsType = colorsType,
+        stringsType = StringsType.Auto,
+    )
+    NewTaskScreenPreview(
+        themeState = themeState,
+        repeated = setOf(
+            Calendar.MONDAY,
+            Calendar.WEDNESDAY,
+            Calendar.THURSDAY,
+        ),
     )
 }
