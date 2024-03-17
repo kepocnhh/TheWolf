@@ -95,7 +95,7 @@ private fun TaskItem(
                         color = App.Theme.colors.text,
                         textAlign = TextAlign.Start,
                         fontSize = 17.sp,
-                        fontWeight = FontWeight.SemiBold,
+//                        fontWeight = FontWeight.SemiBold,
                     ),
                     overflow = TextOverflow.Ellipsis,
                     minLines = 1,

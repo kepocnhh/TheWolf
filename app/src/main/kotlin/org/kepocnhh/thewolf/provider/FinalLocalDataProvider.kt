@@ -60,6 +60,27 @@ internal class FinalLocalDataProvider(
                 .commit()
         }
 
+    override var completed: Set<UUID>
+        get() {
+            val json = preferences
+                .getString("completed", null)
+                ?: return emptySet()
+            val array = JSONArray(json)
+            return (0 until array.length()).map { index ->
+                array.getString(index)
+            }.toSet().map(UUID::fromString).toSet()
+        }
+        set(value) {
+            val array = JSONArray()
+            value.forEach {
+                array.put(it.toString())
+            }
+            preferences
+                .edit()
+                .putString("completed", array.toString())
+                .commit()
+        }
+
     companion object {
         private fun ThemeState.toJSONObject(): JSONObject {
             val stringsType = when (stringsType) {
