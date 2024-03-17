@@ -4,14 +4,15 @@ Another todo list application.
 ---
 
 ### backlog
-- [ ] strings as res
-- [ ] colors as res
-- [ ] keyboard lib
+- [x] strings as res
+- [?] colors as res
+- [?] keyboard lib (new line / space text lang)
 - [ ] pinpad lib
 - [ ] clickable text lib
-- [ ] squares lib
-- [ ] view models lib (logic)
+- [x] squares lib
+- [x] view models lib (logic)
 - [ ] junit asserts lib
 - [ ] dialogs lib semantics
+- [ ] fix multiple clicks
 
 ---

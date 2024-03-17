@@ -5,6 +5,7 @@ import sp.gx.core.kebabCase
 repositories {
     google()
     mavenCentral()
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 
 plugins {
@@ -55,8 +56,8 @@ android {
         applicationId = namespace
         minSdk = Version.Android.minSdk
         targetSdk = Version.Android.targetSdk
-        versionName = "0.0.1"
-        versionCode = 1
+        versionCode = 5
+        versionName = "0.0.$versionCode"
         manifestPlaceholders["appName"] = "@string/app_name"
     }
 
@@ -134,4 +135,10 @@ androidComponents.onVariants { variant ->
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.compose.foundation:foundation:${Version.Android.compose}")
+    implementation("com.github.kepocnhh:Logics:0.1.3-SNAPSHOT")
+    implementation("com.github.kepocnhh:ComposeAnimations:0.1.0u-SNAPSHOT")
+    implementation("com.github.kepocnhh:ComposeKeyboard:0.1.0u-SNAPSHOT")
+    implementation("com.github.kepocnhh:ComposeSquares:0.0.1u-SNAPSHOT")
+    debugImplementation("androidx.compose.ui:ui-tooling:${Version.Android.compose}")
+    debugImplementation("androidx.compose.ui:ui-tooling-preview:${Version.Android.compose}")
 }
